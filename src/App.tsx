@@ -102,7 +102,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                                         width: `${this.getWidth(x, y, grid, width) - 16}`,
                                         height: `${this.getHeight(x, y, grid, height) - 16}`,
                                         playerVars: {
-                                            autoplay: 1,
+                                            autoplay: undefined,
                                         },
                                     }}
                                 />
@@ -164,12 +164,6 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
             this.moveXY = { ix: ix, iy: iy };
         }
         this.setState({});
-
-        const contents = this.refs[this.state.url[0]] as HTMLIFrameElement;
-        console.log(contents.contentWindow);
-        if (contents != null && contents.contentWindow != null) {
-            contents.contentWindow.postMessage('{"event":"command","func":"' + 'playVideo' + '","args":""}', '*');
-        }
     }
 
     onMove(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) {
