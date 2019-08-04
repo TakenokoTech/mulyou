@@ -4,12 +4,12 @@ import Session, { SessionKey } from '../utils/Session';
 import Point from '../utils/Point';
 import setting from '../../setting.json';
 
-interface ModalComponentProps {
+interface SearchModalComponentProps {
     screenSize: Point;
     addURL: (url: string[] | null) => void;
 }
 
-interface ModalComponentState {
+interface SearchModalComponentState {
     result: YoutubeItem[];
     select: string[];
     history: {
@@ -18,8 +18,8 @@ interface ModalComponentState {
     };
 }
 
-export default class ModalComponent extends React.Component<ModalComponentProps, ModalComponentState> {
-    constructor(props: ModalComponentProps) {
+export default class SearchModalComponent extends React.Component<SearchModalComponentProps, SearchModalComponentState> {
+    constructor(props: SearchModalComponentProps) {
         super(props);
         this.state = { result: [], select: [], history: { q: '', nextPageToken: '' } };
     }
@@ -28,7 +28,7 @@ export default class ModalComponent extends React.Component<ModalComponentProps,
         const q = Session.load(SessionKey.HistoryWord);
         if (q != null && q != '') {
             (this.refs.searchText as HTMLInputElement).value = q;
-            this.search(null);
+            // this.search(null);
         }
     }
 
@@ -38,7 +38,7 @@ export default class ModalComponent extends React.Component<ModalComponentProps,
                 <button type="button" className="btn btn-info" onClick={this.showModal}>
                     検索
                 </button>
-                <div className="modal fade" id="exampleModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal fade" id="searchModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -200,10 +200,10 @@ export default class ModalComponent extends React.Component<ModalComponentProps,
     };
 
     showModal = () => {
-        $('#exampleModal').modal('show');
+        $('#searchModal').modal('show');
     };
 
     hideModal = () => {
-        $('#exampleModal').modal('hide');
+        $('#searchModal').modal('hide');
     };
 }

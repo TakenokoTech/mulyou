@@ -8,4 +8,8 @@ export default class Point {
         this.x = x;
         this.y = y;
     }
+
+    dist(p: Point): number {
+        return Math.sqrt(Math.pow(this.x - p.x, 2) + Math.pow(this.y - p.y, 2));
+    }
 }

@@ -7,7 +7,8 @@ import Point from './utils/Point';
 import { number } from 'prop-types';
 import MadiaComponent from './components/MediaComponent';
 import DragComponent from './components/DragComponent';
-import ModalComponent from './components/ModalComponent';
+import ModalComponent from './components/SearchModalComponent';
+import GridModalComponent from './components/GridModalComponent';
 
 const layoutType1 = [[2, 1, 1], [1, 1, 1]];
 
@@ -102,7 +103,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                                 left={p.x}
                                 top={p.y}
                                 setting={this.state.setting}
-                                onClose={() => this.onClose(index)}
+                                onClose={() => this.removeURL(this.state.url[index])}
                             />
                         );
                     });
@@ -152,9 +153,11 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                                 <ModalComponent screenSize={this.state.screenSize} addURL={this.addURL} />
                             </div>
                         </div>
-                        <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px' }}>
-                            grid: {JSON.stringify(this.grid(this.state.url))} {`  `}
-                            url: {this.state.url.length}
+                        <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px 0px' }}>
+                            <div style={{ position: 'absolute' }}>
+                                {/* grid: {JSON.stringify(this.grid(this.state.url))} {`  `} url: {this.state.url.length} */}
+                            </div>
+                            <GridModalComponent screenSize={this.state.screenSize} />
                         </div>
                         <button id="settingPanelClose" className="btn btn-light">
                             close
@@ -190,27 +193,23 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         });
     }
 
-    private onClose(index: number) {
-        console.log('close');
-        const newUrl = this.state.url.filter((n, i) => i != index);
-
-        this.setState({
-            url: newUrl,
-            grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
-        });
-    }
-
     private addURL(url: string[] | null = null) {
         const value = (this.refs.inputVideo as HTMLInputElement).value;
         if (url == null && value == '') return;
-
         url = url || [value];
         const newUrl = this.state.url.concat(url);
         this.setState({
             url: newUrl,
             grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
         });
-        console.log('addURL', this.state.url, this.grid(newUrl)[0], this.grid(newUrl)[1]);
+    }
+
+    private removeURL(url: string) {
+        const newUrl = this.state.url.filter(n => n != url);
+        this.setState({
+            url: newUrl,
+            grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
+        });
     }
 
     private grid = (newUrl: string[]): [number[], number[]] => {

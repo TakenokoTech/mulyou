@@ -1,0 +1,64 @@
+canvas {
+    width: 100%
+}
+
+/* .grid {
+    position: relative;
+    margin: 8px auto;
+}
+*/
+.item {
+    display: block;
+    /* position: absolute; */
+    margin: 2px 0px;
+    z-index: 1;
+    background-color: blue;
+    padding: 20px 40px;
+    text-align: center;
+}
+
+/*
+.item.muuri-dragging,
+.item.muuri-releasing {
+    z-index: 2;
+}
+
+.item.muuri-hidden {
+    z-index: 0;
+}
+*/
+
+.item-content {
+    display: inline-block;
+    position: relative;
+    /* width: 100%;
+    height: 100%; */
+    word-wrap: break-word;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 
+.custom-content {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    background: #c3e6cb;
+    border: 2px solid;
+    border-radius: 3px;
+    border-color: #155724;
+    color: #155724;
+    padding: 0px 8px;
+}
+
+.custom-content div {
+    display: inline-block;
+    width: 80px;
+    margin: 0px 4px;
+}
+
+.custom-content input {
+    display: inline-block;
+    width: 80px;
+    margin: 0px 4px;
+} */
