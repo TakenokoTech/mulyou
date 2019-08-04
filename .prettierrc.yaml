@@ -13,6 +13,10 @@ overrides:
     options:
       tabWidth: 4
   
+  - files: "package.json"
+    options:
+      tabWidth: 4
+  
   - files: "tsconfig.json"
     options:
       tabWidth: 4

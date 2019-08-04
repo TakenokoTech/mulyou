@@ -2,9 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import YouTube from 'react-youtube';
 import './App.css';
-import { dom } from './dom.extension';
+import { dom, CustomMouseEvent } from './dom.extension';
 import Point from './utils/Point';
 import { number } from 'prop-types';
+import MadiaComponent from './components/MediaComponent';
+import DragComponent from './components/DragComponent';
+import ModalComponent from './components/ModalComponent';
 
 const layoutType1 = [[2, 1, 1], [1, 1, 1]];
 
@@ -14,36 +17,42 @@ interface AppContainerState {
     screenSize: Point;
     url: string[];
     grid: Point[][];
+    moveXY: { ix: number | null; iy: number | null };
+    setting: boolean;
 }
 
 class AppContainer extends React.Component<AppContainerProps, AppContainerState> {
-    moveXY: { ix: number | null; iy: number | null } = { ix: null, iy: null };
-    contentRef: string[] = [];
     constructor(props: AppContainerProps) {
         super(props);
         this.onMove = this.onMove.bind(this);
         this.onEventChange = this.onEventChange.bind(this);
         this.state = {
             screenSize: new Point(0, 0),
-            url: ['g0Nkx6zvIRg', 'nMc7s3xrLkY', '', '', '', '', '', '', ''],
+            url: ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             grid: this.initGrid(0, 0),
+            moveXY: { ix: null, iy: null },
+            setting: false,
         };
     }
 
-    initGrid(width: number, height: number): Point[][] {
+    initGrid(width: number, height: number, lx: number[] = [], ly: number[] = []): Point[][] {
         const grid: Point[][] = [];
-        const lenX = 4;
-        const lenY = 4;
+        const lenX = lx.reduce((a, x) => (a += x), 0);
+        const lenY = ly.reduce((a, y) => (a += y), 0);
         let tx = 0;
         let ty = 0;
-        [2, 1].forEach((x, i, l1) => {
+        lx.forEach((x, i, l1) => {
             const g: Point[] = [];
             ty = 0;
-            [1, 1].forEach((y, j, l2) => {
-                g.push(new Point((width / lenX) * (tx + x), (height / lenY) * (ty + y)));
-                ty += y;
-            });
-            grid.push(g);
+            if (l1.length - 1 != i) {
+                ly.forEach((y, j, l2) => {
+                    if (l2.length - 1 != j) {
+                        g.push(new Point((width / lenX) * (tx + x), (height / lenY) * (ty + y)));
+                    }
+                    ty += y;
+                });
+                grid.push(g);
+            }
             tx += x;
         });
         console.log(grid);
@@ -55,11 +64,18 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
 
         this.setState({
             screenSize: new Point(width, height),
-            grid: this.initGrid(width, height),
+            grid: this.initGrid(width, height, [1, 1], [1, 1]),
         });
+
+        document.onkeydown = e => {
+            if (e.code == 'Space') {
+                this.setState({ setting: !this.state.setting });
+            }
+        };
     }
 
     render() {
+        console.log('========================');
         const prevGrid = this.state.grid;
         const f1 = prevGrid.filter((v, i) => i == 0).map((g, i) => g.map(p => new Point(0, p.y)));
         const f2 = prevGrid.map((g, i) => g.filter((v, i) => i == 0).map(p => new Point(p.x, 0)));
@@ -70,116 +86,150 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
 
         const width = this.state.screenSize.x;
         const height = this.state.screenSize.y;
-        const dragging = this.moveXY.ix != null || this.moveXY.iy != null;
+        const dragging = this.state.moveXY.ix != null || this.state.moveXY.iy != null;
         return (
             <div className="app-container" ref="frame">
                 {grid.map((g, x, xl) => {
                     return g.map((p, y, yl) => {
+                        const index = x * yl.length + y;
+                        console.log('====', index, this.state.url[index]);
                         return (
-                            <div
-                                className={`frame_box`}
-                                style={{
-                                    left: p.x,
-                                    top: p.y,
-                                }}
+                            <MadiaComponent
+                                screenSize={this.state.screenSize}
                                 key={`f${x}${y}`}
-                            >
-                                {/* <iframe
-                                    title="title1"
-                                    className="iframe"
-                                    width={this.getWidth(x, y, grid, width) - 16}
-                                    height={this.getHeight(x, y, grid, height) - 16}
-                                    key={p.x + '' + p.y + '_i'}
-                                    ref={this.state.url[x * yl.length + y]}
-                                    src={'https://www.youtube.com/embed/' + this.state.url[x * yl.length + y]}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                /> */}
-                                <YouTube
-                                    videoId={this.state.url[x * yl.length + y]}
-                                    opts={{
-                                        width: `${this.getWidth(x, y, grid, width) - 16}`,
-                                        height: `${this.getHeight(x, y, grid, height) - 16}`,
-                                        playerVars: {
-                                            autoplay: undefined,
-                                        },
-                                    }}
-                                />
-                                <button
-                                    className="btn btn-primary rounded-circle p-0"
-                                    style={{
-                                        position: 'absolute',
-                                        width: '32px',
-                                        height: '32px',
-                                        right: '24px',
-                                        top: '24px',
-                                    }}
-                                    key={p.x + '' + p.y + '_b'}
-                                    onClick={this.close}
-                                >
-                                    ×
-                                </button>
-                            </div>
+                                videoId={this.state.url[index]}
+                                height={this.getHeight(x, y, grid, height) - 8}
+                                width={this.getWidth(x, y, grid, width) - 8}
+                                left={p.x}
+                                top={p.y}
+                                setting={this.state.setting}
+                                onClose={() => this.onClose(index)}
+                            />
                         );
                     });
                 })}
                 {this.state.grid.map((g, x) => {
                     return g.map((p, y) =>
                         p.x == 0 || p.y == 0 ? null : (
-                            <div
-                                style={{
-                                    left: p.x - 20,
-                                    top: p.y - 20,
-                                    backgroundColor: x == this.moveXY.ix && y == this.moveXY.iy ? '#FF0' : '#FFF',
-                                }}
-                                key={x + '' + y}
-                                className="close_button"
-                                onMouseDown={e => this.onEventChange(e, x, y)}
-                                onMouseMove={e => this.onMove(e)}
+                            <DragComponent
+                                moveXY={this.state.moveXY}
+                                indexX={x}
+                                indexY={y}
+                                key={`drag${x}${y}`}
+                                left={p.x - 16}
+                                top={p.y - 16}
+                                color={x == this.state.moveXY.ix && y == this.state.moveXY.iy ? '#FF0' : '#FFF'}
+                                onEventChange={this.onEventChange}
+                                onMove={this.onMove}
                             />
                         ),
                     );
                 })}
-                {dragging ? <div id="drag_view" style={{ cursor: dragging ? 'move' : '' }} onMouseMove={e => this.onMove(e)} /> : null}
+                {dragging ? (
+                    <div
+                        id="drag_view"
+                        style={{
+                            cursor: dragging ? 'move' : '',
+                        }}
+                        onMouseMove={e => this.onMove(e)}
+                    />
+                ) : null}
+                {this.state.setting ? (
+                    <div
+                        id="settingPanel"
+                        style={{
+                            left: width / 2 - 300,
+                        }}
+                    >
+                        <div className="input-group">
+                            <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
+                            <div className="input-group-append">
+                                <button className="btn btn-outline-secondary" type="button" onClick={e => this.addURL(e)}>
+                                    ADD
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px' }}>
+                            grid: {JSON.stringify(this.grid(this.state.url))} {`  `}
+                            url: {this.state.url.length}
+                        </div>
+                        <button id="settingPanelClose" className="btn btn-light">
+                            close
+                        </button>
+                    </div>
+                ) : null}
+                <ModalComponent />
             </div>
         );
     }
 
-    getWidth(x: number, y: number, grid: Point[][], displayWidth: number): number {
-        const w = x < grid[0].length - 1 ? grid[x + 1][y].x - grid[x][y].x : displayWidth - grid[x][y].x;
-        return w;
-    }
-    getHeight(x: number, y: number, grid: Point[][], displayHeight: number): number {
-        const h = y < grid.length - 1 ? grid[x][y + 1].y - grid[x][y].y : displayHeight - grid[x][y].y;
-        return h;
+    private getWidth(x: number, y: number, grid: Point[][], displayWidth: number): number {
+        return grid[x + 1] ? grid[x + 1][y].x - grid[x][y].x : displayWidth - grid[x][y].x;
     }
 
-    onEventChange(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>, ix: number | null = null, iy: number | null = null) {
+    private getHeight(x: number, y: number, grid: Point[][], displayHeight: number): number {
+        return grid[x][y + 1] ? grid[x][y + 1].y - grid[x][y].y : displayHeight - grid[x][y].y;
+    }
+
+    private onEventChange(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>, ix: number | null = null, iy: number | null = null) {
         // console.log('onEventChange', ix, iy);
-        const dragging = this.moveXY.ix != null || this.moveXY.iy != null;
-        if (dragging) {
-            this.moveXY = { ix: null, iy: null };
-        } else {
-            this.moveXY = { ix: ix, iy: iy };
-        }
-        this.setState({});
+        const dragging = this.state.moveXY.ix != null || this.state.moveXY.iy != null;
+        this.setState({ moveXY: dragging ? { ix: null, iy: null } : { ix: ix, iy: iy } });
     }
 
-    onMove(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    private onMove(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) {
         // console.log('onMove', e.clientX, e.clientY);
         const grid = this.state.grid;
-        if (this.moveXY.ix != null && this.moveXY.iy != null) {
-            grid[this.moveXY.ix][this.moveXY.iy] = new Point(e.clientX, e.clientY);
+        if (this.state.moveXY.ix != null && this.state.moveXY.iy != null) {
+            grid[this.state.moveXY.ix][this.state.moveXY.iy] = new Point(e.clientX, e.clientY);
         }
         this.setState({
             grid: grid,
         });
     }
 
-    close() {
+    private onClose(index: number) {
         console.log('close');
+        const newUrl = this.state.url.filter((n, i) => i != index);
+
+        this.setState({
+            url: newUrl,
+            grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
+        });
     }
+
+    private addURL(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        const url = (this.refs.inputVideo as HTMLInputElement).value;
+        if (url == '') return;
+
+        const newUrl = this.state.url.concat(url);
+        this.setState({
+            url: newUrl,
+            grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
+        });
+        console.log('addURL', this.state.url, this.grid(newUrl)[0], this.grid(newUrl)[1]);
+    }
+
+    private grid = (newUrl: string[]): [number[], number[]] => {
+        const len = newUrl.length;
+        if (len >= 10) {
+            return [[1, 1, 1], [1, 1, 1, 1]];
+        } else if (len >= 9) {
+            return [[1, 1, 1], [1, 1, 1]];
+        } else if (len >= 7) {
+            return [[1, 1], [1, 1, 1, 1]];
+        } else if (len >= 5) {
+            return [[1, 1], [1, 1, 1]];
+        } else if (len >= 3) {
+            return [[1, 1], [1, 1]];
+        } else if (len >= 2) {
+            return [[1], [1, 1]];
+        } else if (len == 1) {
+            return [[1], [1]];
+        } else {
+            return [[], []];
+        }
+    };
 }
 
 ReactDOM.render(<AppContainer />, document.getElementById('root'));

@@ -9,6 +9,7 @@
         "start": "webpack --mode=development",
         "watch": "webpack -w --mode=development",
         "test": "mocha -r ts-node/register ./test/**/*.ts",
+        "serve": "webpack-dev-server --hot --inline --watch-content-base --content-base dev-dist/ --open-page index.html ",
         "deploy": "set NODE_ENV=production && webpack",
         "gh": "gh-pages -d prod-dist"
     },
@@ -40,6 +41,12 @@
         "typescript": "^3.5.3",
         "web-animations-js": "^2.3.2",
         "webpack": "^4.38.0",
-        "webpack-cli": "^3.3.6"
+        "webpack-cli": "^3.3.6",
+        "webpack-dev-server": "^3.7.2"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^1.2.21",
+        "@fortawesome/free-solid-svg-icons": "^5.10.1",
+        "@fortawesome/react-fontawesome": "^0.1.4"
     }
 }
