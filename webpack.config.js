@@ -34,6 +34,9 @@ const development = {
         new CopyWebpackPlugin([{ from: ".", to: "./js", ignore: ["!*.js"] }], { context: "static/js" }),
         new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" })
     ],
+    // devServer: {
+    //     public: "c72f14ca.ngrok.io",
+    // },
     devtool: "inline-source-map"
 };
 

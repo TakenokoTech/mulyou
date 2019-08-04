@@ -26,12 +26,13 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         super(props);
         this.onMove = this.onMove.bind(this);
         this.onEventChange = this.onEventChange.bind(this);
+        this.addURL = this.addURL.bind(this);
         this.state = {
             screenSize: new Point(0, 0),
-            url: ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
+            url: [], // ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             grid: this.initGrid(0, 0),
             moveXY: { ix: null, iy: null },
-            setting: false,
+            setting: true,
         };
     }
 
@@ -64,18 +65,17 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
 
         this.setState({
             screenSize: new Point(width, height),
-            grid: this.initGrid(width, height, [1, 1], [1, 1]),
+            grid: this.initGrid(width, height, [], []),
         });
 
-        document.onkeydown = e => {
-            if (e.code == 'Space') {
-                this.setState({ setting: !this.state.setting });
-            }
-        };
+        // document.onkeydown = e => {
+        //     if (e.code == 'Space') {
+        //         this.setState({ setting: !this.state.setting });
+        //     }
+        // };
     }
 
     render() {
-        console.log('========================');
         const prevGrid = this.state.grid;
         const f1 = prevGrid.filter((v, i) => i == 0).map((g, i) => g.map(p => new Point(0, p.y)));
         const f2 = prevGrid.map((g, i) => g.filter((v, i) => i == 0).map(p => new Point(p.x, 0)));
@@ -92,7 +92,6 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                 {grid.map((g, x, xl) => {
                     return g.map((p, y, yl) => {
                         const index = x * yl.length + y;
-                        console.log('====', index, this.state.url[index]);
                         return (
                             <MadiaComponent
                                 screenSize={this.state.screenSize}
@@ -109,21 +108,23 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                     });
                 })}
                 {this.state.grid.map((g, x) => {
-                    return g.map((p, y) =>
-                        p.x == 0 || p.y == 0 ? null : (
+                    return g.map((p, y) => {
+                        const dragging = x == this.state.moveXY.ix && y == this.state.moveXY.iy;
+                        return p.x == 0 || p.y == 0 ? null : (
                             <DragComponent
                                 moveXY={this.state.moveXY}
                                 indexX={x}
                                 indexY={y}
                                 key={`drag${x}${y}`}
-                                left={p.x - 16}
-                                top={p.y - 16}
-                                color={x == this.state.moveXY.ix && y == this.state.moveXY.iy ? '#FF0' : '#FFF'}
+                                dragKey={`drag${x}${y}`}
+                                left={p.x - 12}
+                                top={p.y - 12}
+                                color={dragging ? '#FF0' : '#FFF'}
                                 onEventChange={this.onEventChange}
                                 onMove={this.onMove}
                             />
-                        ),
-                    );
+                        );
+                    });
                 })}
                 {dragging ? (
                     <div
@@ -144,9 +145,11 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         <div className="input-group">
                             <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
                             <div className="input-group-append">
-                                <button className="btn btn-outline-secondary" type="button" onClick={e => this.addURL(e)}>
+                                <button className="btn btn-outline-secondary" type="button" onClick={e => this.addURL()}>
                                     ADD
                                 </button>
+                                　
+                                <ModalComponent screenSize={this.state.screenSize} addURL={this.addURL} />
                             </div>
                         </div>
                         <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px' }}>
@@ -158,7 +161,6 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         </button>
                     </div>
                 ) : null}
-                <ModalComponent />
             </div>
         );
     }
@@ -198,10 +200,11 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         });
     }
 
-    private addURL(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        const url = (this.refs.inputVideo as HTMLInputElement).value;
-        if (url == '') return;
+    private addURL(url: string[] | null = null) {
+        const value = (this.refs.inputVideo as HTMLInputElement).value;
+        if (url == null && value == '') return;
 
+        url = url || [value];
         const newUrl = this.state.url.concat(url);
         this.setState({
             url: newUrl,

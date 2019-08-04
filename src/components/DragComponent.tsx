@@ -1,13 +1,11 @@
 import React from 'react';
-import YouTube from 'react-youtube';
-import { typeAlias } from '@babel/types';
 import { CustomMouseEvent } from '../dom.extension';
 
 interface DragComponentProps {
     moveXY: { ix: number | null; iy: number | null };
     indexX: number;
     indexY: number;
-    key: string;
+    dragKey: string;
     left: number;
     top: number;
     color: string;
@@ -27,7 +25,7 @@ export default class DragComponent extends React.Component<DragComponentProps, D
                     top: this.props.top,
                     backgroundColor: this.props.color,
                 }}
-                key={this.props.key}
+                key={this.props.dragKey}
                 onMouseDown={e => this.props.onEventChange(e, this.props.indexX, this.props.indexY)}
                 onMouseMove={e => this.props.onMove(e)}
             />
