@@ -2,6 +2,7 @@ import React from 'react';
 import { gapi } from '../utils/gapi';
 import Session, { SessionKey } from '../utils/Session';
 import Point from '../utils/Point';
+import setting from '../../setting.json';
 
 interface ModalComponentProps {
     screenSize: Point;
@@ -122,7 +123,7 @@ export default class ModalComponent extends React.Component<ModalComponentProps,
         return new Promise(resolve => {
             gapi.load('client', () => {
                 gapi.client.load('youtube', 'v3', () => {
-                    gapi.client.setApiKey('AIzaSyCSfo5WgTq25Hwdqznz2gXj5c2Frl89sIU');
+                    gapi.client.setApiKey(setting.ApiKey);
                     const request = gapi.client.youtube.search.list({
                         q: text,
                         type: 'video',
