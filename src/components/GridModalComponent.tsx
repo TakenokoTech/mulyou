@@ -45,7 +45,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div className="modal-body" ref="canvasFrame" onClick={this.onClick} style={{ height: '400px' }}>
+                            <div className="modal-body" ref="canvasFrame" style={{ height: '400px' }}>
                                 <canvas
                                     ref="canvas"
                                     width={this.state.canvasFrameSize.x}
@@ -68,9 +68,9 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         );
     }
 
-    object: { currentObject: { index: number; p: Point }[]; stockObject: { index: number; p: Point }[]; selectIndex: number } = {
-        currentObject: [],
-        stockObject: [],
+    object: { baseObject: number[][]; currentObject: number[][]; selectIndex: number } = {
+        baseObject: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+        currentObject: [[1, 2, 3, -1], [4, 5, 6, -1], [7, 8, 9, -1], [-1, -1, -1, -1]],
         selectIndex: -1,
     };
 
@@ -88,7 +88,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         context.textAlign = 'center';
         context.textBaseline = 'middle';
 
-        const rect = (p: Point, index: number, draggable: boolean) => {
+        const rect = (p: Point, index: number | string, draggable: boolean) => {
             context.beginPath();
             context.fillStyle = 'rgba(255, 255, 255, 1)';
             context.strokeStyle = 'rgba(0, 0, 0, 0.9)';
@@ -96,7 +96,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.closePath();
             context.stroke();
 
-            if (this.object.selectIndex == index) {
+            if (this.object.selectIndex == index && index != -1) {
                 context.beginPath();
                 context.fillStyle = 'rgba(255, 0, 0, 0.5)';
                 context.strokeStyle = 'rgba(0, 0, 0, 0.9)';
@@ -109,12 +109,12 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.fillStyle = draggable ? 'rgba(0, 0, 0, 0.9)' : 'rgba(128, 128, 128, 0.5)';
             context.strokeStyle = draggable ? 'rgba(0, 0, 0, 0.9)' : 'rgba(128, 128, 128, 0.5)';
             context.rect(-(d / 2) + p.x, -(d / 2) + p.y, d, d);
-            context.fillText(`${index}`, p.x, p.y);
+            index != -1 && context.fillText(`${index}`, p.x, p.y);
             context.closePath();
             context.stroke();
         };
 
-        const base = (p: Point, index: number) => {
+        const base = (p: Point) => {
             context.beginPath();
             context.fillStyle = 'rgba(192, 192, 192, 0.9)';
             context.strokeStyle = 'rgba(0, 0, 0, 0.9)';
@@ -123,52 +123,86 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.stroke();
         };
 
-        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]].map((g, x, xl) => {
-            return g.map((p, y, yl) => {
-                const point = new Point(72 * (1 + x), 72 * (1 + y));
-                base(point, p);
+        this.object.baseObject.map((g, x) => {
+            return g.map((p, y) => {
+                base(this.pointCurrent(x, y));
             });
         });
 
-        const list1: { index: number; p: Point }[] = [];
-        [[1, 2, 3], [4, 5, 6], [7, 8, 9]].map((g, x, xl) => {
-            return g.map((p, y, yl) => {
-                const point = new Point(72 * (1 + x), 72 * (1 + y));
-                list1.push({ index: p, p: point });
-                rect(point, p, true);
+        this.object.currentObject.map((g, x) => {
+            return g.map((p, y) => {
+                rect(this.pointCurrent(x, y), p, true);
             });
         });
-        this.object.currentObject = list1;
 
-        const list2: { index: number; p: Point }[] = [];
-        [10, 11, 12, 13, 14, 15, 16].map((p, i, xl) => {
-            const point = new Point(width - 72 * (1 + Math.floor(i / 4)), 72 * (1 + (i % 4)));
-            list2.push({ index: p, p: point });
-            rect(point, p, i == 0);
+        this.stockObj().map((p, i, xl) => {
+            rect(this.pointStoke(i), p, i == 0);
         });
-        this.object.stockObject = list2;
+        rect(this.pointStoke(this.stockObj().length), 'clear', this.object.selectIndex != -1);
+    };
+
+    pointCurrent = (x: number, y: number): Point => {
+        return new Point(72 * (1 + x), 72 * (1 + y));
+    };
+
+    pointStoke = (i: number): Point => {
+        const width = (this.refs.canvas as HTMLCanvasElement).width;
+        return new Point(width - 72 * (1 + Math.floor(i / 4)), 72 * (1 + (i % 4)));
+    };
+
+    stockObj = () => {
+        return this.object.baseObject.flatMap(x => x).filter(a => this.object.currentObject.flatMap(x => x).indexOf(a) == -1);
     };
 
     handlerCanvas = () => {
-        (this.refs.canvas as HTMLCanvasElement).addEventListener('click', e => {
-            const rect = (this.refs.canvas as HTMLCanvasElement).getBoundingClientRect();
-            const point = new Point(e.clientX - rect.left, e.clientY - rect.top);
-            this.object.currentObject.forEach((v, i) => {
-                if (v.p.dist(point) < 36) {
-                    this.object.selectIndex = v.index;
-                }
-            });
-            this.object.stockObject.forEach((v, i) => {
-                if (v.p.dist(point) < 36) {
-                    this.object.selectIndex = v.index;
-                }
-            });
-            this.renderCanvas();
-        });
+        (this.refs.canvas as HTMLCanvasElement).addEventListener('click', this.onClick);
     };
 
-    onClick = () => {
-        console.log();
+    onClick = (e: any) => {
+        const rect = (this.refs.canvas as HTMLCanvasElement).getBoundingClientRect();
+        const point = new Point(e.clientX - rect.left, e.clientY - rect.top);
+        const swap = (x: number, y: number, index: number): number[][] => {
+            const selectIndex = this.object.selectIndex;
+            console.log(`x: ${x}, y: ${y}, index: ${index}, selectIndex: ${selectIndex}`);
+            const result = this.object.baseObject.map((g, ix) => {
+                return g.map((i, iy) => {
+                    const c = this.object.currentObject[ix][iy];
+                    if (x == ix && y == iy) return selectIndex;
+                    if (c == selectIndex) return index;
+                    return c;
+                });
+            });
+            return result;
+        };
+        // Select
+        this.object.currentObject.map((g, x) => {
+            return g.map((index, y) => {
+                const p = this.pointCurrent(x, y);
+                if (p.dist(point) < 36) {
+                    if (this.object.selectIndex == -1) {
+                        this.object.selectIndex = index;
+                    } else {
+                        this.object.currentObject = swap(x, y, index);
+                        this.object.selectIndex = -1;
+                    }
+                }
+            });
+        });
+        // Stoke
+        this.stockObj().map((index, i, il) => {
+            const p = this.pointStoke(i);
+            if (p.dist(point) < 36 && i == 0) {
+                console.log(index);
+                this.object.selectIndex = index;
+            }
+        });
+        // CLear
+        const p = this.pointStoke(this.stockObj().length);
+        if (p.dist(point) < 36) {
+            this.object.currentObject = swap(-1, -1, -1);
+            this.object.selectIndex = -1;
+        }
+        this.renderCanvas();
     };
 
     showModal = () => {
