@@ -5,6 +5,7 @@ import { dom } from '../dom.extension';
 
 interface GridModalComponentProps {
     screenSize: Point;
+    setLayout: (lx: number[], ly: number[]) => void;
 }
 
 interface GridModalComponentState {
@@ -14,6 +15,14 @@ interface GridModalComponentState {
 export default class GridModalComponent extends React.Component<GridModalComponentProps, GridModalComponentState> {
     canvasContext: CanvasRenderingContext2D | null = null;
     grid: any | null;
+    side = 64;
+    space = 8;
+
+    object: { baseObject: number[][]; currentObject: number[][]; selectIndex: number } = {
+        baseObject: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+        currentObject: [[1, 2, 3, -1], [4, 5, 6, -1], [7, 8, 9, -1], [-1, -1, -1, -1]],
+        selectIndex: -1,
+    };
 
     constructor(props: GridModalComponentProps) {
         super(props);
@@ -26,7 +35,9 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         this.handlerCanvas();
     }
 
-    componentWillReceiveProps() {}
+    componentWillReceiveProps() {
+        /**/
+    }
 
     render() {
         return (
@@ -57,8 +68,8 @@ export default class GridModalComponent extends React.Component<GridModalCompone
                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">
                                     Close
                                 </button>
-                                <button type="button" className="btn btn-primary" onClick={() => {}}>
-                                    Add
+                                <button type="button" className="btn btn-primary" onClick={this.hideModal}>
+                                    Apply
                                 </button>
                             </div>
                         </div>
@@ -68,23 +79,15 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         );
     }
 
-    object: { baseObject: number[][]; currentObject: number[][]; selectIndex: number } = {
-        baseObject: [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
-        currentObject: [[1, 2, 3, -1], [4, 5, 6, -1], [7, 8, 9, -1], [-1, -1, -1, -1]],
-        selectIndex: -1,
-    };
-
     renderCanvas = () => {
         const context = this.canvasContext as CanvasRenderingContext2D;
         const width = (this.refs.canvas as HTMLCanvasElement).width;
         const height = (this.refs.canvas as HTMLCanvasElement).height;
-        const d = 64;
+        const d = this.side;
 
         context.globalAlpha = 1;
         context.clearRect(0, 0, width, height);
-
         context.font = '16px serif';
-
         context.textAlign = 'center';
         context.textBaseline = 'middle';
 
@@ -96,14 +99,12 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.closePath();
             context.stroke();
 
-            if (this.object.selectIndex == index && index != -1) {
-                context.beginPath();
-                context.fillStyle = 'rgba(255, 0, 0, 0.5)';
-                context.strokeStyle = 'rgba(0, 0, 0, 0.9)';
-                context.fillRect(-(d / 2) + p.x, -(d / 2) + p.y, d, d);
-                context.closePath();
-                context.stroke();
-            }
+            context.beginPath();
+            context.fillStyle = draggable ? 'rgba(23, 162, 184, 1)' : 'rgba(23, 162, 184, 0.5)';
+            if (index == 'clear') context.fillStyle = this.object.selectIndex != -1 ? 'rgba(108, 117, 125, 1)' : 'rgba(108, 117, 125, 0.5)';
+            index != -1 && context.fillRect(-(d / 2) + p.x, -(d / 2) + p.y, d, d);
+            context.closePath();
+            context.stroke();
 
             context.beginPath();
             context.fillStyle = draggable ? 'rgba(0, 0, 0, 0.9)' : 'rgba(128, 128, 128, 0.5)';
@@ -112,6 +113,15 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             index != -1 && context.fillText(`${index}`, p.x, p.y);
             context.closePath();
             context.stroke();
+
+            if (this.object.selectIndex == index && index != -1) {
+                context.beginPath();
+                context.fillStyle = 'rgba(255, 193, 7, 1)';
+                context.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+                context.fillRect(-(d / 2) + p.x, -(d / 2) + p.y, d, d);
+                context.closePath();
+                context.stroke();
+            }
         };
 
         const base = (p: Point) => {
@@ -121,19 +131,31 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.fillRect(-(d / 2) + p.x, -(d / 2) + p.y, d, d);
             context.closePath();
             context.stroke();
+            console.log();
         };
 
-        this.object.baseObject.map((g, x) => {
-            return g.map((p, y) => {
-                base(this.pointCurrent(x, y));
-            });
-        });
+        const size = (p: Point) => {
+            context.beginPath();
+            context.fillStyle = 'rgba(220, 53, 69, 0.8)';
+            context.strokeStyle = 'rgba(220, 53, 69, 0.8)';
+            context.fillRect(d / 2 + this.space / 2, d / 2 + this.space / 2, (d + this.space) * (p.x + 1), (d + this.space) * (p.y + 1));
+            context.closePath();
+            context.stroke();
+        };
 
-        this.object.currentObject.map((g, x) => {
-            return g.map((p, y) => {
+        size(this.getLayout());
+
+        this.object.baseObject.map((g, x) =>
+            g.map((p, y) => {
+                base(this.pointCurrent(x, y));
+            }),
+        );
+
+        this.object.currentObject.map((g, x) =>
+            g.map((p, y) => {
                 rect(this.pointCurrent(x, y), p, true);
-            });
-        });
+            }),
+        );
 
         this.stockObj().map((p, i, xl) => {
             rect(this.pointStoke(i), p, i == 0);
@@ -142,16 +164,30 @@ export default class GridModalComponent extends React.Component<GridModalCompone
     };
 
     pointCurrent = (x: number, y: number): Point => {
-        return new Point(72 * (1 + x), 72 * (1 + y));
+        return new Point((this.side + this.space) * (1 + x), (this.side + this.space) * (1 + y));
     };
 
     pointStoke = (i: number): Point => {
         const width = (this.refs.canvas as HTMLCanvasElement).width;
-        return new Point(width - 72 * (1 + Math.floor(i / 4)), 72 * (1 + (i % 4)));
+        return new Point(width - (this.side + this.space) * (1 + Math.floor(i / 4)), (this.side + this.space) * (1 + (i % 4)));
     };
 
     stockObj = () => {
         return this.object.baseObject.flatMap(x => x).filter(a => this.object.currentObject.flatMap(x => x).indexOf(a) == -1);
+    };
+
+    getLayout = (): Point => {
+        let lenx = 0;
+        let leny = 0;
+        this.object.currentObject.map((g, x) =>
+            g.map((p, y) => {
+                if (p != -1) {
+                    lenx = lenx > x ? lenx : x;
+                    leny = leny > y ? leny : y;
+                }
+            }),
+        );
+        return new Point(lenx, leny);
     };
 
     handlerCanvas = () => {
@@ -216,5 +252,8 @@ export default class GridModalComponent extends React.Component<GridModalCompone
 
     hideModal = () => {
         $('#gridModal').modal('hide');
+        const x = this.getLayout().x + 1;
+        const y = this.getLayout().y + 1;
+        this.props.setLayout(Array(x).fill(1), Array(y).fill(1));
     };
 }

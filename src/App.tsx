@@ -9,6 +9,7 @@ import MadiaComponent from './components/MediaComponent';
 import DragComponent from './components/DragComponent';
 import ModalComponent from './components/SearchModalComponent';
 import GridModalComponent from './components/GridModalComponent';
+import Session, { SessionKey } from './utils/Session';
 
 const layoutType1 = [[2, 1, 1], [1, 1, 1]];
 
@@ -17,9 +18,9 @@ interface AppContainerProps {}
 interface AppContainerState {
     screenSize: Point;
     url: string[];
-    grid: Point[][];
     moveXY: { ix: number | null; iy: number | null };
     setting: boolean;
+    layout: { x: number[]; y: number[] };
 }
 
 class AppContainer extends React.Component<AppContainerProps, AppContainerState> {
@@ -28,16 +29,23 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         this.onMove = this.onMove.bind(this);
         this.onEventChange = this.onEventChange.bind(this);
         this.addURL = this.addURL.bind(this);
+
+        const gridLayout = Session.load(SessionKey.GridLayout);
+        const l = gridLayout ? JSON.parse(gridLayout) : { x: [1], y: [1] };
         this.state = {
             screenSize: new Point(0, 0),
-            url: [], // ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
-            grid: this.initGrid(0, 0),
+            url: ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             moveXY: { ix: null, iy: null },
             setting: true,
+            layout: { x: l.x || [], y: l.y || [] },
         };
     }
 
-    initGrid(width: number, height: number, lx: number[] = [], ly: number[] = []): Point[][] {
+    initGrid(): Point[][] {
+        const width = this.state.screenSize.x;
+        const height = this.state.screenSize.y;
+        const lx = this.state.layout.x;
+        const ly = this.state.layout.y;
         const grid: Point[][] = [];
         const lenX = lx.reduce((a, x) => (a += x), 0);
         const lenY = ly.reduce((a, y) => (a += y), 0);
@@ -66,7 +74,6 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
 
         this.setState({
             screenSize: new Point(width, height),
-            grid: this.initGrid(width, height, [], []),
         });
 
         // document.onkeydown = e => {
@@ -74,10 +81,18 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         //         this.setState({ setting: !this.state.setting });
         //     }
         // };
+
+        window.addEventListener('resize', () => {
+            const { width: width, height: height } = dom(this.refs.frame);
+            this.setState({
+                screenSize: new Point(width, height),
+            });
+        });
     }
 
     render() {
-        const prevGrid = this.state.grid;
+        const temp = this.initGrid();
+        const prevGrid = this.initGrid();
         const f1 = prevGrid.filter((v, i) => i == 0).map((g, i) => g.map(p => new Point(0, p.y)));
         const f2 = prevGrid.map((g, i) => g.filter((v, i) => i == 0).map(p => new Point(p.x, 0)));
 
@@ -108,7 +123,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         );
                     });
                 })}
-                {this.state.grid.map((g, x) => {
+                {temp.map((g, x) => {
                     return g.map((p, y) => {
                         const dragging = x == this.state.moveXY.ix && y == this.state.moveXY.iy;
                         return p.x == 0 || p.y == 0 ? null : (
@@ -157,7 +172,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                             <div style={{ position: 'absolute' }}>
                                 {/* grid: {JSON.stringify(this.grid(this.state.url))} {`  `} url: {this.state.url.length} */}
                             </div>
-                            <GridModalComponent screenSize={this.state.screenSize} />
+                            <GridModalComponent screenSize={this.state.screenSize} setLayout={this.setLayout} />
                         </div>
                         <button id="settingPanelClose" className="btn btn-light">
                             close
@@ -177,20 +192,20 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
     }
 
     private onEventChange(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>, ix: number | null = null, iy: number | null = null) {
-        // console.log('onEventChange', ix, iy);
+        console.log('onEventChange', e.clientX, e.clientY);
         const dragging = this.state.moveXY.ix != null || this.state.moveXY.iy != null;
         this.setState({ moveXY: dragging ? { ix: null, iy: null } : { ix: ix, iy: iy } });
     }
 
     private onMove(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        // console.log('onMove', e.clientX, e.clientY);
-        const grid = this.state.grid;
-        if (this.state.moveXY.ix != null && this.state.moveXY.iy != null) {
-            grid[this.state.moveXY.ix][this.state.moveXY.iy] = new Point(e.clientX, e.clientY);
-        }
-        this.setState({
-            grid: grid,
-        });
+        console.log('onMove', e.clientX, e.clientY);
+        // const grid = this.state.grid;
+        // if (this.state.moveXY.ix != null && this.state.moveXY.iy != null) {
+        //     grid[this.state.moveXY.ix][this.state.moveXY.iy] = new Point(e.clientX, e.clientY);
+        // }
+        // this.setState({
+        //     grid: grid,
+        // });
     }
 
     private addURL(url: string[] | null = null) {
@@ -200,7 +215,6 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         const newUrl = this.state.url.concat(url);
         this.setState({
             url: newUrl,
-            grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
         });
     }
 
@@ -208,9 +222,15 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         const newUrl = this.state.url.filter(n => n != url);
         this.setState({
             url: newUrl,
-            grid: this.initGrid(this.state.screenSize.x, this.state.screenSize.y, this.grid(newUrl)[0], this.grid(newUrl)[1]),
         });
     }
+
+    setLayout = (lx: number[], ly: number[]) => {
+        Session.save(SessionKey.GridLayout, JSON.stringify({ x: lx, y: ly }));
+        this.setState({
+            layout: { x: lx, y: ly },
+        });
+    };
 
     private grid = (newUrl: string[]): [number[], number[]] => {
         const len = newUrl.length;
