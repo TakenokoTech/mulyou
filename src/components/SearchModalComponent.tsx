@@ -2,16 +2,16 @@ import React from 'react';
 import { gapi } from '../utils/gapi';
 import Session, { SessionKey } from '../utils/Session';
 import Point from '../utils/Point';
-import setting from '../../setting.json';
+import * as YoutubeApi from '../repository/YoutubeApi';
 
 interface SearchModalComponentProps {
     screenSize: Point;
-    addURL: (url: string[] | null) => void;
+    addItem: (item: YoutubeItem[] | null) => void;
 }
 
 interface SearchModalComponentState {
     result: YoutubeItem[];
-    select: string[];
+    select: YoutubeItem[];
     history: {
         q: string;
         nextPageToken: string;
@@ -35,7 +35,13 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
     render() {
         return (
             <div>
-                <button type="button" className="btn btn-info" onClick={this.showModal}>
+                <button
+                    type="button"
+                    className="btn btn-info ml-1"
+                    onClick={() => {
+                        $('#searchModal').modal('show');
+                    }}
+                >
                     検索
                 </button>
                 <div className="modal fade" id="searchModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -68,12 +74,7 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
                                     {this.state.result
                                         ? this.state.result.map((item, i) => {
                                               return (
-                                                  <li
-                                                      key={i}
-                                                      className="media my-4"
-                                                      onClick={() => this.selectItem(item.id.videoId)}
-                                                      style={{ cursor: 'pointer' }}
-                                                  >
+                                                  <li key={i} className="media my-4" onClick={() => this.selectItem(item)} style={{ cursor: 'pointer' }}>
                                                       <img
                                                           className="mr-3"
                                                           src={item.snippet.thumbnails.high.url}
@@ -81,7 +82,7 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
                                                           width="120"
                                                           style={{
                                                               border:
-                                                                  this.state.select.indexOf(item.id.videoId) > -1
+                                                                  this.state.select.map(i => i.id.videoId).indexOf(item.id.videoId) > -1
                                                                       ? '4px solid #FF0000CC'
                                                                       : '4px solid #FF000000',
                                                           }}
@@ -119,32 +120,11 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
         );
     }
 
-    private async fetchVideo(text: string, pageToken: string | null = null): Promise<any> {
-        return new Promise(resolve => {
-            gapi.load('client', () => {
-                gapi.client.load('youtube', 'v3', () => {
-                    gapi.client.setApiKey(setting.ApiKey);
-                    const request = gapi.client.youtube.search.list({
-                        q: text,
-                        type: 'video',
-                        part: 'snippet',
-                        maxResults: '20',
-                        order: 'date',
-                        pageToken: pageToken,
-                    });
-                    request.execute((response: any) => {
-                        resolve(response.result);
-                    });
-                });
-            });
-        });
-    }
-
     private search = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null) => {
         const text = (this.refs.searchText as HTMLInputElement).value;
         Session.save(SessionKey.HistoryWord, text);
 
-        const fetchVideo = await this.fetchVideo(text);
+        const fetchVideo = await YoutubeApi.fetchVideo(text);
         const nextPageToken = fetchVideo.nextPageToken;
         const items = fetchVideo.items;
         const yitem = items.map((v: any) => {
@@ -162,7 +142,7 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
     private next = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null) => {
         const text = this.state.history.q;
         const token = this.state.history.nextPageToken;
-        const fetchVideo = await this.fetchVideo(text, token);
+        const fetchVideo = await YoutubeApi.fetchVideo(text, token);
         const nextPageToken = fetchVideo.nextPageToken;
         const items = fetchVideo.items;
         const yitem = items.map((v: any) => {
@@ -177,33 +157,24 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
         });
     };
 
-    private selectItem = async (videoId: string) => {
-        console.log(SessionKey.HistoryWord, videoId);
+    private selectItem = async (item: YoutubeItem) => {
+        console.log(SessionKey.HistoryWord, item);
         let select = this.state.select;
-        if (select.indexOf(videoId) > -1) {
-            select = select.filter(i => i != videoId);
+        if (select.map(i => i.id).indexOf(item.id) > -1) {
+            select = select.filter(i => i.id != item.id);
         } else {
-            select = select.concat(videoId);
+            select = select.concat(item);
         }
-
         this.setState({
             select: select,
         });
     };
 
     private add = () => {
-        this.props.addURL(this.state.select);
-        this.hideModal();
+        this.props.addItem(this.state.select);
+        $('#searchModal').modal('hide');
         this.setState({
             select: [],
         });
-    };
-
-    showModal = () => {
-        $('#searchModal').modal('show');
-    };
-
-    hideModal = () => {
-        $('#searchModal').modal('hide');
     };
 }

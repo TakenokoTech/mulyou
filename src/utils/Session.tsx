@@ -1,6 +1,7 @@
 export enum SessionKey {
     HistoryWord = 'historyWord',
     GridLayout = 'GridLayout',
+    HistoryItem = 'HistoryItem',
 }
 
 class Session {

@@ -5,6 +5,7 @@ import { dom } from '../dom.extension';
 
 interface GridModalComponentProps {
     screenSize: Point;
+    layout: { x: number[]; y: number[] };
     setLayout: (lx: number[], ly: number[]) => void;
 }
 
@@ -35,14 +36,18 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         this.handlerCanvas();
     }
 
-    componentWillReceiveProps() {
-        /**/
+    shouldComponentUpdate(nextProps: GridModalComponentProps, nextState: GridModalComponentState, nextContext: any) {
+        const obj: number[][] = [[-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1], [-1, -1, -1, -1]];
+        let i = 1;
+        nextProps.layout.x.map((g, x) => nextProps.layout.y.map((g, y) => (obj[x][y] = i++)));
+        this.object.currentObject = obj;
+        return true;
     }
 
     render() {
         return (
             <>
-                <button type="button" className="btn btn-info" onClick={this.showModal}>
+                <button type="button" className="btn btn-info ml-1" onClick={this.showModal}>
                     グリッド調整
                 </button>
                 <div className="modal fade" id="gridModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -83,6 +88,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         const context = this.canvasContext as CanvasRenderingContext2D;
         const width = (this.refs.canvas as HTMLCanvasElement).width;
         const height = (this.refs.canvas as HTMLCanvasElement).height;
+        this.side = Math.max(width / 12, height / 7);
         const d = this.side;
 
         context.globalAlpha = 1;
@@ -110,7 +116,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.fillStyle = draggable ? 'rgba(0, 0, 0, 0.9)' : 'rgba(128, 128, 128, 0.5)';
             context.strokeStyle = draggable ? 'rgba(0, 0, 0, 0.9)' : 'rgba(128, 128, 128, 0.5)';
             context.rect(-(d / 2) + p.x, -(d / 2) + p.y, d, d);
-            index != -1 && context.fillText(`${index}`, p.x, p.y);
+            if (index == 'clear') context.fillText(`${index}`, p.x, p.y);
             context.closePath();
             context.stroke();
 
@@ -199,7 +205,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         const point = new Point(e.clientX - rect.left, e.clientY - rect.top);
         const swap = (x: number, y: number, index: number): number[][] => {
             const selectIndex = this.object.selectIndex;
-            console.log(`x: ${x}, y: ${y}, index: ${index}, selectIndex: ${selectIndex}`);
+            // console.log(`x: ${x}, y: ${y}, index: ${index}, selectIndex: ${selectIndex}`);
             const result = this.object.baseObject.map((g, ix) => {
                 return g.map((i, iy) => {
                     const c = this.object.currentObject[ix][iy];
@@ -228,7 +234,6 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         this.stockObj().map((index, i, il) => {
             const p = this.pointStoke(i);
             if (p.dist(point) < 36 && i == 0) {
-                console.log(index);
                 this.object.selectIndex = index;
             }
         });
@@ -254,6 +259,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         $('#gridModal').modal('hide');
         const x = this.getLayout().x + 1;
         const y = this.getLayout().y + 1;
+        console.log(x, y);
         this.props.setLayout(Array(x).fill(1), Array(y).fill(1));
     };
 }

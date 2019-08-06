@@ -1,5 +1,7 @@
 import React from 'react';
 import { CustomMouseEvent } from '../dom.extension';
+import { faCog, faArrowsAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface DragComponentProps {
     moveXY: { ix: number | null; iy: number | null };
@@ -23,12 +25,19 @@ export default class DragComponent extends React.Component<DragComponentProps, D
                 style={{
                     left: this.props.left,
                     top: this.props.top,
-                    backgroundColor: this.props.color,
+                    backgroundColor: 'transparent',
                 }}
                 key={this.props.dragKey}
                 onMouseDown={e => this.props.onEventChange(e, this.props.indexX, this.props.indexY)}
                 onMouseMove={e => this.props.onMove(e)}
-            />
+            >
+                <button
+                    className="btn btn-secondaly rounded-circle p-0"
+                    style={{ position: 'absolute', width: '24px', height: '24px', right: '0px', top: '0px' }}
+                >
+                    <FontAwesomeIcon icon={faArrowsAlt} style={{ color: this.props.color }} />
+                </button>
+            </div>
         );
     }
 }
