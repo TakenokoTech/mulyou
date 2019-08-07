@@ -62,7 +62,8 @@
     position: absolute;
     bottom: 16px;
     height: 160px;
-    width: 600px;
+    width: 96%;
+    max-width: 600px;
     background-color: #FFFE;
     z-index: 1500;
     padding: 16px;
@@ -71,8 +72,9 @@
 }
 
 #settingPanelClose {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+    width: 100%;
+    /* position: absolute; */
+    /* bottom: 16px; */
+    /* left: 50%; */
+    /* transform: translateX(-50%); */
 }

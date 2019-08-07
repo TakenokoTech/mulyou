@@ -61,12 +61,12 @@ export default class GridModalComponent extends React.Component<GridModalCompone
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div className="modal-body" ref="canvasFrame" style={{ height: '400px' }}>
+                            <div className="modal-body" ref="canvasFrame" style={{ height: this.state.canvasFrameSize.x }}>
                                 <canvas
                                     ref="canvas"
                                     width={this.state.canvasFrameSize.x}
-                                    height={this.state.canvasFrameSize.y}
-                                    style={{ width: this.state.canvasFrameSize.x + 'px', height: this.state.canvasFrameSize.y + 'px' }}
+                                    height={this.state.canvasFrameSize.x}
+                                    style={{ width: this.state.canvasFrameSize.x + 'px', height: this.state.canvasFrameSize.x + 'px' }}
                                 />
                             </div>
                             <div className="modal-footer">
@@ -88,7 +88,8 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         const context = this.canvasContext as CanvasRenderingContext2D;
         const width = (this.refs.canvas as HTMLCanvasElement).width;
         const height = (this.refs.canvas as HTMLCanvasElement).height;
-        this.side = Math.max(width / 12, height / 7);
+        this.side = width / 10;
+        this.space = this.side / 10;
         const d = this.side;
 
         context.globalAlpha = 1;
@@ -144,7 +145,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             context.beginPath();
             context.fillStyle = 'rgba(220, 53, 69, 0.8)';
             context.strokeStyle = 'rgba(220, 53, 69, 0.8)';
-            context.fillRect(d / 2 + this.space / 2, d / 2 + this.space / 2, (d + this.space) * (p.x + 1), (d + this.space) * (p.y + 1));
+            context.fillRect(0, d / 2 - this.space, (d + this.space) * (p.x + 1) + this.space, (d + this.space) * (p.y + 1) + this.space);
             context.closePath();
             context.stroke();
         };
@@ -170,12 +171,16 @@ export default class GridModalComponent extends React.Component<GridModalCompone
     };
 
     pointCurrent = (x: number, y: number): Point => {
-        return new Point((this.side + this.space) * (1 + x), (this.side + this.space) * (1 + y));
+        const px = +this.side / 2 + this.space + (this.side + this.space) * x;
+        const py = +this.side + (this.side + this.space) * y;
+        return new Point(px, py);
     };
 
     pointStoke = (i: number): Point => {
         const width = (this.refs.canvas as HTMLCanvasElement).width;
-        return new Point(width - (this.side + this.space) * (1 + Math.floor(i / 4)), (this.side + this.space) * (1 + (i % 4)));
+        const px = -this.side / 2 - this.space + width - (this.side + this.space) * Math.floor(i / 4);
+        const py = +this.side + (this.side + this.space) * (i % 4);
+        return new Point(px, py);
     };
 
     stockObj = () => {

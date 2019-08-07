@@ -154,12 +154,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                     />
                 ) : null}
                 {this.state.setting ? (
-                    <div
-                        id="settingPanel"
-                        style={{
-                            left: width / 2 - 300,
-                        }}
-                    >
+                    <div id="settingPanel" style={{}}>
                         <div className="input-group">
                             <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
                             <div className="input-group-append">
