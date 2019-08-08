@@ -58,10 +58,10 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                 />
                 {this.props.setting ? (
                     <>
-                        <button className="close_button btn btn-danger rounded-circle p-0" style={{}} onClick={() => this.props.onEnd()}>
+                        <button className="close_button btn btn-danger rounded-circle p-0" style={{ zIndex: 1000 }} onClick={() => this.props.onEnd()}>
                             <FontAwesomeIcon icon={faTimes} />
                         </button>
-                        <button className="select_button btn btn-success rounded-circle p-0" style={{}} onClick={this.onCheck}>
+                        <button className="select_button btn btn-success rounded-circle p-0" style={{ zIndex: 1000 }} onClick={this.onCheck}>
                             <FontAwesomeIcon icon={faCheck} />
                         </button>
                     </>

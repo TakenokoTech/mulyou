@@ -7,10 +7,8 @@ import Point from './utils/Point';
 import { number } from 'prop-types';
 import MadiaComponent from './components/MediaComponent';
 import DragComponent from './components/DragComponent';
-import ModalComponent from './components/SearchModalComponent';
-import GridModalComponent from './components/GridModalComponent';
 import Session, { SessionKey } from './utils/Session';
-import StockModalComponent from './components/StockModalComponent';
+import SettingComponent from './components/SettingComponent';
 
 const layoutType1 = [[2, 1, 1], [1, 1, 1]];
 
@@ -149,27 +147,14 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                     />
                 ) : null}
                 {this.state.setting ? (
-                    <div id="settingPanel" style={{}}>
-                        <div className="input-group">
-                            <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
-                            <div className="input-group-append">
-                                <button className="btn btn-outline-secondary" type="button" onClick={e => this.addInputItem()}>
-                                    ADD
-                                </button>{' '}
-                                <ModalComponent screenSize={this.state.screenSize} addItem={this.addSearchItem} />
-                            </div>
-                        </div>
-                        <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px 0px' }}>
-                            <div style={{ position: 'absolute' }}>
-                                {/* grid: {JSON.stringify(this.grid(this.state.url))} {`  `} url: {this.state.url.length} */}
-                            </div>
-                            <StockModalComponent screenSize={this.state.screenSize} />
-                            <GridModalComponent screenSize={this.state.screenSize} layout={this.state.layout} setLayout={this.setLayout} />
-                        </div>
-                        <button id="settingPanelClose" className="btn btn-light" onClick={this.closeSetting}>
-                            close
-                        </button>
-                    </div>
+                    <SettingComponent
+                        screenSize={this.state.screenSize}
+                        layout={this.state.layout}
+                        addInputItem={this.addInputItem}
+                        addSearchItem={this.addSearchItem}
+                        setLayout={this.setLayout}
+                        closeSetting={this.closeSetting}
+                    />
                 ) : null}
             </div>
         );
@@ -201,8 +186,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         // });
     };
 
-    private addInputItem = () => {
-        const value = (this.refs.inputVideo as HTMLInputElement).value;
+    private addInputItem = (value: string) => {
         if (value == '') return;
         const url = [value];
         const newUrl = this.state.url.concat(url);
