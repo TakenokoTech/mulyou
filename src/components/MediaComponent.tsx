@@ -12,7 +12,7 @@ interface MadiaComponentProps {
     left: number;
     top: number;
     setting: boolean;
-    onClose: () => void;
+    onEnd: () => void;
 }
 
 interface MadiaComponentState {
@@ -23,6 +23,10 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
     constructor(props: MadiaComponentProps) {
         super(props);
         this.state = { selecting: false };
+    }
+
+    componentDidMount() {
+        if (this.props.videoId == 'unknown') this.props.onEnd();
     }
 
     render() {
@@ -46,10 +50,15 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                         },
                     }}
                     onReady={this.onReady}
+                    onPlay={this.onPlay}
+                    onPause={this.onPause}
+                    onEnd={this.onEnd}
+                    onError={this.onError}
+                    onStateChange={this.onStateChange}
                 />
                 {this.props.setting ? (
                     <>
-                        <button className="close_button btn btn-danger rounded-circle p-0" style={{}} onClick={() => this.props.onClose()}>
+                        <button className="close_button btn btn-danger rounded-circle p-0" style={{}} onClick={() => this.props.onEnd()}>
                             <FontAwesomeIcon icon={faTimes} />
                         </button>
                         <button className="select_button btn btn-success rounded-circle p-0" style={{}} onClick={this.onCheck}>
@@ -65,6 +74,27 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
         console.log('onReady');
         // event.target.pauseVideo();
         event.target.mute();
+    };
+
+    private onPlay = (event: { target: any; data: number }) => {
+        console.log('onPlay', event.target, event.data);
+    };
+
+    private onPause = (event: { target: any; data: number }) => {
+        console.log('onPause', event.target, event.data);
+    };
+
+    private onEnd = (event: { target: any; data: number }) => {
+        console.log('onEnd', event.target, event.data);
+        this.props.onEnd();
+    };
+
+    private onError = (event: { target: any; data: number }) => {
+        console.log('onError', event.target, event.data);
+    };
+
+    private onStateChange = (event: { target: any; data: number }) => {
+        // console.log('onStateChange', event.target, event.data);
     };
 
     private onCheck = (event: { target: any }) => {

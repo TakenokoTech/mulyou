@@ -2,6 +2,7 @@ export enum SessionKey {
     HistoryWord = 'historyWord',
     GridLayout = 'GridLayout',
     HistoryItem = 'HistoryItem',
+    NowPlayItem = 'NowPlayItem',
 }
 
 class Session {

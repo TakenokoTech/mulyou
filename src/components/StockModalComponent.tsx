@@ -5,15 +5,16 @@ import * as YoutubeApi from '../repository/YoutubeApi';
 
 interface StockModalComponentProps {
     screenSize: Point;
-    stock: YoutubeItem[];
 }
 
-interface StockModalComponentState {}
+interface StockModalComponentState {
+    stock: YoutubeItem[];
+}
 
 export default class StockModalComponent extends React.Component<StockModalComponentProps, StockModalComponentState> {
     constructor(props: StockModalComponentProps) {
         super(props);
-        this.state = { result: [], select: [], history: { q: '', nextPageToken: '' } };
+        this.state = { stock: [] };
     }
 
     componentDidMount() {}
@@ -21,13 +22,7 @@ export default class StockModalComponent extends React.Component<StockModalCompo
     render() {
         return (
             <>
-                <button
-                    type="button"
-                    className="btn btn-info ml-1"
-                    onClick={() => {
-                        $('#stockModal').modal('show');
-                    }}
-                >
+                <button type="button" className="btn btn-info ml-1" onClick={this.show}>
                     ストック
                 </button>
                 <div className="modal fade" id="stockModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -43,7 +38,7 @@ export default class StockModalComponent extends React.Component<StockModalCompo
                             </div>
                             <div className="modal-body">
                                 <ul className="list-unstyled" style={{ height: this.props.screenSize.y * 0.7, overflowY: 'scroll' }}>
-                                    {this.props.stock.map((item, i) => {
+                                    {this.state.stock.map((item, i) => {
                                         return (
                                             <li
                                                 key={i}
@@ -82,4 +77,11 @@ export default class StockModalComponent extends React.Component<StockModalCompo
             </>
         );
     }
+
+    show = () => {
+        const h = Session.load(SessionKey.HistoryItem);
+        let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
+        this.setState({ stock: stock });
+        $('#stockModal').modal('show');
+    };
 }

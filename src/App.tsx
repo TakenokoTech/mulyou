@@ -22,27 +22,23 @@ interface AppContainerState {
     moveXY: { ix: number | null; iy: number | null };
     setting: boolean;
     layout: { x: number[]; y: number[] };
-    stock: YoutubeItem[];
 }
 
 class AppContainer extends React.Component<AppContainerProps, AppContainerState> {
     constructor(props: AppContainerProps) {
         super(props);
-        this.onMove = this.onMove.bind(this);
         this.onEventChange = this.onEventChange.bind(this);
 
         const gridLayout = Session.load(SessionKey.GridLayout);
         const l = gridLayout ? JSON.parse(gridLayout) : { x: [1, 1], y: [1, 1] };
-        const h = Session.load(SessionKey.HistoryItem);
-        let historyItem = h ? (JSON.parse(h) as YoutubeItem[]) : [];
+        const item = Session.load(SessionKey.NowPlayItem);
 
         this.state = {
             screenSize: new Point(0, 0),
-            url: ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
+            url: item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             moveXY: { ix: null, iy: null },
             setting: true,
             layout: { x: l.x || [], y: l.y || [] },
-            stock: historyItem,
         };
     }
 
@@ -73,23 +69,22 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
 
     componentDidMount() {
         const { width: width, height: height } = dom(this.refs.frame);
-
-        this.setState({
-            screenSize: new Point(width, height),
-        });
-
-        // document.onkeydown = e => {
-        //     if (e.code == 'Space') {
-        //         this.setState({ setting: !this.state.setting });
-        //     }
-        // };
-
         window.addEventListener('resize', () => {
             const { width: width, height: height } = dom(this.refs.frame);
             this.setState({
                 screenSize: new Point(width, height),
             });
         });
+
+        this.setState({
+            screenSize: new Point(width, height),
+        });
+    }
+
+    shouldComponentUpdate(nextProps: AppContainerProps, nextState: AppContainerState, nextContext: any) {
+        console.log(nextState.url);
+        Session.save(SessionKey.NowPlayItem, JSON.stringify(nextState.url));
+        return true;
     }
 
     render() {
@@ -114,13 +109,13 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                             <MadiaComponent
                                 screenSize={this.state.screenSize}
                                 key={`f${x}${y}`}
-                                videoId={this.state.url[index]}
+                                videoId={this.state.url[index] || 'unknown'}
                                 height={this.getHeight(x, y, grid, height) - 8}
                                 width={this.getWidth(x, y, grid, width) - 8}
                                 left={p.x}
                                 top={p.y}
                                 setting={this.state.setting}
-                                onClose={() => this.removeURL(this.state.url[index])}
+                                onEnd={() => this.next(index)}
                             />
                         );
                     });
@@ -158,17 +153,17 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         <div className="input-group">
                             <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
                             <div className="input-group-append">
-                                <button className="btn btn-outline-secondary" type="button" onClick={e => this.addItem()}>
+                                <button className="btn btn-outline-secondary" type="button" onClick={e => this.addInputItem()}>
                                     ADD
                                 </button>{' '}
-                                <ModalComponent screenSize={this.state.screenSize} addItem={this.addItem} />
+                                <ModalComponent screenSize={this.state.screenSize} addItem={this.addSearchItem} />
                             </div>
                         </div>
                         <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px 0px' }}>
                             <div style={{ position: 'absolute' }}>
                                 {/* grid: {JSON.stringify(this.grid(this.state.url))} {`  `} url: {this.state.url.length} */}
                             </div>
-                            <StockModalComponent screenSize={this.state.screenSize} stock={this.state.stock} />
+                            <StockModalComponent screenSize={this.state.screenSize} />
                             <GridModalComponent screenSize={this.state.screenSize} layout={this.state.layout} setLayout={this.setLayout} />
                         </div>
                         <button id="settingPanelClose" className="btn btn-light" onClick={this.closeSetting}>
@@ -195,8 +190,8 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         this.setState({ moveXY: dragging ? { ix: null, iy: null } : { ix: ix, iy: iy } });
     }
 
-    private onMove(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) {
-        console.log('onMove', e.clientX, e.clientY);
+    private onMove = (e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        // console.log('onMove', e.clientX, e.clientY);
         // const grid = this.state.grid;
         // if (this.state.moveXY.ix != null && this.state.moveXY.iy != null) {
         //     grid[this.state.moveXY.ix][this.state.moveXY.iy] = new Point(e.clientX, e.clientY);
@@ -204,30 +199,53 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         // this.setState({
         //     grid: grid,
         // });
-    }
+    };
 
-    private addItem = (item: YoutubeItem[] | null = null) => {
+    private addInputItem = () => {
         const value = (this.refs.inputVideo as HTMLInputElement).value;
-        if (item == null && value == '') return;
-        const url = (item || []).map(i => i.id.videoId) || [value];
+        if (value == '') return;
+        const url = [value];
         const newUrl = this.state.url.concat(url);
-        // Session
-        const h = Session.load(SessionKey.HistoryItem);
-        let historyItem = h ? (JSON.parse(h) as YoutubeItem[]) : [];
-        historyItem = historyItem.concat(item || []);
-        Session.save(SessionKey.HistoryItem, JSON.stringify(historyItem));
         this.setState({
             url: newUrl,
-            stock: historyItem,
         });
     };
 
-    private removeURL(url: string) {
-        const newUrl = this.state.url.filter(n => n != url);
-        this.setState({
-            url: newUrl,
-        });
-    }
+    private addSearchItem = (item: YoutubeItem[]) => {
+        const h = Session.load(SessionKey.HistoryItem);
+        let historyItem = h ? (JSON.parse(h) as YoutubeItem[]) : [];
+        historyItem = historyItem.concat(item);
+        Session.save(SessionKey.HistoryItem, JSON.stringify(historyItem));
+
+        const count = this.state.layout.x.length * this.state.layout.y.length;
+        const len = this.state.url.length;
+        for (let index = 0; index < count; index++) {
+            if (len <= index) this.next(index);
+        }
+    };
+
+    private next = (index: number) => {
+        const count = this.state.layout.x.length * this.state.layout.y.length;
+        const len = this.state.url.length;
+        if (count < len) {
+            this.state.url[index] = this.state.url[count];
+            this.state.url.splice(count, 1);
+            this.setState({
+                url: this.state.url,
+            });
+            return;
+        }
+
+        const h = Session.load(SessionKey.HistoryItem);
+        let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
+        if (stock.length > 0) {
+            this.state.url[index] = stock[0].id.videoId;
+            Session.save(SessionKey.HistoryItem, JSON.stringify(stock.slice(1)));
+            this.setState({
+                url: this.state.url,
+            });
+        }
+    };
 
     private setLayout = (lx: number[], ly: number[]) => {
         Session.save(SessionKey.GridLayout, JSON.stringify({ x: lx, y: ly }));

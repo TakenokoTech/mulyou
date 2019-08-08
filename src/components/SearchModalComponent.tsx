@@ -6,7 +6,7 @@ import * as YoutubeApi from '../repository/YoutubeApi';
 
 interface SearchModalComponentProps {
     screenSize: Point;
-    addItem: (item: YoutubeItem[] | null) => void;
+    addItem: (item: YoutubeItem[]) => void;
 }
 
 interface SearchModalComponentState {
