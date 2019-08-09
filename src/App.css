@@ -50,31 +50,10 @@
 
 #drag_view {
     position: absolute;
-    background-color: #0009;
+    background-color: #0006;
     height: 100%;
     width: 100%;
     left: 0, ;
     top: 0;
     z-index: 500;
-}
-
-#settingPanel {
-    position: absolute;
-    bottom: 16px;
-    height: 160px;
-    width: 96%;
-    max-width: 600px;
-    background-color: #FFFE;
-    z-index: 1500;
-    padding: 16px;
-    border-radius: 8px;
-    color: #444
-}
-
-#settingPanelClose {
-    width: 100%;
-    /* position: absolute; */
-    /* bottom: 16px; */
-    /* left: 50%; */
-    /* transform: translateX(-50%); */
 }

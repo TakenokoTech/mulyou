@@ -22,7 +22,7 @@ export default class StockModalComponent extends React.Component<StockModalCompo
     render() {
         return (
             <>
-                <button type="button" className="btn btn-info ml-1" onClick={this.show}>
+                <button type="button" className="btn btn-info btn-sm ml-1" onClick={this.show}>
                     ストック
                 </button>
                 <div className="modal fade" id="stockModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

@@ -6,27 +6,49 @@ import Point from '../utils/Point';
 
 interface MadiaComponentProps {
     screenSize: Point;
-    videoId: string;
+    videoId: string | null;
     height: number;
     width: number;
     left: number;
     top: number;
     setting: boolean;
+    bulkVolume: number;
+    bulkPlay: boolean;
     onEnd: () => void;
 }
 
 interface MadiaComponentState {
+    player: any;
     selecting: boolean;
 }
 
 export default class MadiaComponent extends React.Component<MadiaComponentProps, MadiaComponentState> {
     constructor(props: MadiaComponentProps) {
         super(props);
-        this.state = { selecting: false };
+        this.state = { player: null, selecting: false };
     }
 
     componentDidMount() {
-        if (this.props.videoId == 'unknown') this.props.onEnd();
+        if (this.props.videoId == null) this.props.onEnd();
+    }
+
+    shouldComponentUpdate(nextProps: MadiaComponentProps, nextState: MadiaComponentState, nextContext: any) {
+        if (!this.state.player) return false;
+        console.log(this.props.bulkVolume, nextProps.bulkVolume);
+        if (this.props.bulkVolume != nextProps.bulkVolume && nextProps.bulkVolume == 0) {
+            this.state.player.mute();
+        }
+        if (this.props.bulkVolume != nextProps.bulkVolume && nextProps.bulkVolume > 0) {
+            this.state.player.unMute();
+            this.state.player.setVolume(this.props.bulkVolume);
+        }
+        if (this.props.bulkPlay && !nextProps.bulkPlay) {
+            this.state.player.pauseVideo();
+        }
+        if (!this.props.bulkPlay && nextProps.bulkPlay) {
+            this.state.player.playVideo();
+        }
+        return true;
     }
 
     render() {
@@ -36,7 +58,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                 style={{
                     left: this.props.left,
                     top: this.props.top,
-                    border: this.state.selecting ? '4px solid #F00' : '4px solid #F000',
+                    border: this.props.setting && this.state.selecting ? '4px solid #F00' : '4px solid #F000',
                 }}
                 key={this.props.videoId}
             >
@@ -72,8 +94,9 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
 
     private onReady = (event: { target: any }) => {
         console.log('onReady');
-        // event.target.pauseVideo();
+        //event.target.pauseVideo();
         event.target.mute();
+        this.setState({ player: event.target });
     };
 
     private onPlay = (event: { target: any; data: number }) => {

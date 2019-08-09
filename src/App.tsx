@@ -10,16 +10,16 @@ import DragComponent from './components/DragComponent';
 import Session, { SessionKey } from './utils/Session';
 import SettingComponent from './components/SettingComponent';
 
-const layoutType1 = [[2, 1, 1], [1, 1, 1]];
-
 interface AppContainerProps {}
 
 interface AppContainerState {
     screenSize: Point;
-    url: string[];
+    url: (string | null)[];
     moveXY: { ix: number | null; iy: number | null };
     setting: boolean;
     layout: { x: number[]; y: number[] };
+    bulkPlay: boolean;
+    bulkVolume: number;
 }
 
 class AppContainer extends React.Component<AppContainerProps, AppContainerState> {
@@ -37,6 +37,8 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
             moveXY: { ix: null, iy: null },
             setting: true,
             layout: { x: l.x || [], y: l.y || [] },
+            bulkPlay: false,
+            bulkVolume: 0,
         };
     }
 
@@ -80,7 +82,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
     }
 
     shouldComponentUpdate(nextProps: AppContainerProps, nextState: AppContainerState, nextContext: any) {
-        console.log(nextState.url);
+        // console.log(nextState.url);
         Session.save(SessionKey.NowPlayItem, JSON.stringify(nextState.url));
         return true;
     }
@@ -107,12 +109,14 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                             <MadiaComponent
                                 screenSize={this.state.screenSize}
                                 key={`f${x}${y}`}
-                                videoId={this.state.url[index] || 'unknown'}
+                                videoId={this.state.url[index]}
                                 height={this.getHeight(x, y, grid, height) - 8}
                                 width={this.getWidth(x, y, grid, width) - 8}
                                 left={p.x}
                                 top={p.y}
                                 setting={this.state.setting}
+                                bulkVolume={this.state.bulkVolume}
+                                bulkPlay={this.state.bulkPlay}
                                 onEnd={() => this.next(index)}
                             />
                         );
@@ -137,15 +141,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         );
                     });
                 })}
-                {dragging ? (
-                    <div
-                        id="drag_view"
-                        style={{
-                            cursor: dragging ? 'move' : '',
-                        }}
-                        onMouseMove={e => this.onMove(e)}
-                    />
-                ) : null}
+                {this.state.setting ? <div id="drag_view" style={{ cursor: dragging ? 'move' : '' }} onMouseMove={e => this.onMove(e)} /> : null}
                 {this.state.setting ? (
                     <SettingComponent
                         screenSize={this.state.screenSize}
@@ -154,6 +150,10 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         addSearchItem={this.addSearchItem}
                         setLayout={this.setLayout}
                         closeSetting={this.closeSetting}
+                        allVolumeDown={this.allVolumeDown}
+                        allVolumeUp={this.allVolumeUp}
+                        allStart={this.allStart}
+                        allStop={this.allStop}
                     />
                 ) : null}
             </div>
@@ -171,7 +171,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
     private onEventChange(e: MouseEvent | React.MouseEvent<HTMLDivElement, MouseEvent>, ix: number | null = null, iy: number | null = null) {
         console.log('onEventChange', e.clientX, e.clientY);
         const dragging = this.state.moveXY.ix != null || this.state.moveXY.iy != null;
-        !dragging && this.openSetting();
+        !this.state.setting ? this.openSetting() : this.closeSetting();
         this.setState({ moveXY: dragging ? { ix: null, iy: null } : { ix: ix, iy: iy } });
     }
 
@@ -186,16 +186,17 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         // });
     };
 
-    private addInputItem = (value: string) => {
-        if (value == '') return;
-        const url = [value];
-        const newUrl = this.state.url.concat(url);
-        this.setState({
-            url: newUrl,
-        });
-    };
+    private addInputItem = (value: string) => (value != '' ? this.setState({ url: this.state.url.concat([value]) }) : null);
 
     private addSearchItem = (item: YoutubeItem[]) => {
+        this.state.url.forEach((v, i) => {
+            if (v == null) {
+                const it = item.shift();
+                this.state.url[i] = it ? it.id.videoId : null;
+                this.setState({ url: this.state.url });
+            }
+        });
+
         const h = Session.load(SessionKey.HistoryItem);
         let historyItem = h ? (JSON.parse(h) as YoutubeItem[]) : [];
         historyItem = historyItem.concat(item);
@@ -209,14 +210,13 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
     };
 
     private next = (index: number) => {
+        console.log(`next ${index}`);
         const count = this.state.layout.x.length * this.state.layout.y.length;
         const len = this.state.url.length;
         if (count < len) {
             this.state.url[index] = this.state.url[count];
             this.state.url.splice(count, 1);
-            this.setState({
-                url: this.state.url,
-            });
+            this.setState({ url: this.state.url });
             return;
         }
 
@@ -225,26 +225,23 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         if (stock.length > 0) {
             this.state.url[index] = stock[0].id.videoId;
             Session.save(SessionKey.HistoryItem, JSON.stringify(stock.slice(1)));
-            this.setState({
-                url: this.state.url,
-            });
+        } else {
+            this.state.url[index] = null;
         }
+        this.setState({ url: this.state.url });
     };
 
     private setLayout = (lx: number[], ly: number[]) => {
         Session.save(SessionKey.GridLayout, JSON.stringify({ x: lx, y: ly }));
-        this.setState({
-            layout: { x: lx, y: ly },
-        });
+        this.setState({ layout: { x: lx, y: ly } });
     };
 
-    private openSetting = () => {
-        this.setState({ setting: true });
-    };
-
-    private closeSetting = () => {
-        this.setState({ setting: false });
-    };
+    private allVolumeDown = () => this.setState({ bulkVolume: Math.max(this.state.bulkVolume - 10, 0) });
+    private allVolumeUp = () => this.setState({ bulkVolume: Math.min(this.state.bulkVolume + 10, 100) });
+    private allStart = () => this.setState({ bulkPlay: true });
+    private allStop = () => this.setState({ bulkPlay: false });
+    private openSetting = () => this.setState({ setting: true });
+    private closeSetting = () => this.setState({ setting: false });
 }
 
 ReactDOM.render(<AppContainer />, document.getElementById('root'));

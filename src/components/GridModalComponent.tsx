@@ -47,7 +47,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
     render() {
         return (
             <>
-                <button type="button" className="btn btn-info ml-1" onClick={this.showModal}>
+                <button type="button" className="btn btn-info btn-sm ml-1" onClick={this.showModal}>
                     グリッド調整
                 </button>
                 <div className="modal fade" id="gridModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

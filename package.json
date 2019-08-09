@@ -22,9 +22,11 @@
         "@babel/preset-typescript": "^7.3.3",
         "@babel/runtime": "^7.5.5",
         "@types/chai": "^4.1.7",
+        "@types/gapi": "0.0.39",
         "@types/mathjs": "^6.0.0",
         "@types/mocha": "^5.2.7",
         "@types/react-dom": "^16.8.5",
+        "@types/react-redux": "^7.1.1",
         "@types/react-youtube": "^7.6.2",
         "babel-loader": "^8.0.6",
         "babel-plugin-transform-class-properties": "^6.24.1",
@@ -42,7 +44,9 @@
         "muuri": "^0.8.0",
         "react": "^16.8.6",
         "react-dom": "^16.8.6",
+        "react-redux": "^7.1.0",
         "react-youtube": "^7.9.0",
+        "redux": "^4.0.4",
         "style-loader": "^0.23.1",
         "ts-node": "^8.3.0",
         "typescript": "^3.5.3",
@@ -54,8 +58,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^1.2.21",
         "@fortawesome/free-solid-svg-icons": "^5.10.1",
-        "@fortawesome/react-fontawesome": "^0.1.4",
-        "@types/gapi": "0.0.39"
+        "@fortawesome/react-fontawesome": "^0.1.4"
     },
     "browser": {
         "child_process": false

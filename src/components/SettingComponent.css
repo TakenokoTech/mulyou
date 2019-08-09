@@ -1,0 +1,31 @@
+#settingPanel {
+    position: absolute;
+    bottom: 16px;
+    /* height: 160px; */
+    width: 96%;
+    max-width: 600px;
+    background-color: #FFFE;
+    z-index: 1500;
+
+    border-radius: 8px;
+    color: #444
+}
+
+#setting_header {
+    padding: 4px 16px;
+    color: #FFF;
+    background-color: #6c757d;
+    border-radius: 8px 8px 0px 0px;
+    user-select: none;
+    cursor: move;
+}
+
+#setting_content {
+    padding: 16px;
+}
+
+#settingPanelClose {
+    float: right;
+    color: #FFF;
+    background-color: #6c757d;
+}
