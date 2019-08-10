@@ -1,16 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import YouTube from 'react-youtube';
+import queryString, { ParsedQuery } from 'query-string';
 import './App.css';
-import { dom, CustomMouseEvent } from './dom.extension';
+import { dom } from './dom.extension';
 import Point from './utils/Point';
-import { number } from 'prop-types';
 import MadiaComponent from './components/MediaComponent';
 import DragComponent from './components/DragComponent';
 import Session, { SessionKey } from './utils/Session';
 import SettingComponent from './components/SettingComponent';
+import { Location } from 'history';
 
-interface AppContainerProps {}
+interface AppContainerProps {
+    query: ParsedQuery<string>;
+}
 
 interface AppContainerState {
     screenSize: Point;
@@ -22,20 +24,19 @@ interface AppContainerState {
     bulkVolume: number;
 }
 
-class AppContainer extends React.Component<AppContainerProps, AppContainerState> {
+export class AppContainer extends React.Component<AppContainerProps, AppContainerState> {
     constructor(props: AppContainerProps) {
         super(props);
         this.onEventChange = this.onEventChange.bind(this);
 
         const gridLayout = Session.load(SessionKey.GridLayout);
         const l = gridLayout ? JSON.parse(gridLayout) : { x: [1, 1], y: [1, 1] };
-        const item = Session.load(SessionKey.NowPlayItem);
 
         this.state = {
             screenSize: new Point(0, 0),
-            url: item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
+            url: [],
             moveXY: { ix: null, iy: null },
-            setting: true,
+            setting: false,
             layout: { x: l.x || [], y: l.y || [] },
             bulkPlay: false,
             bulkVolume: 0,
@@ -76,7 +77,11 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
             });
         });
 
+        const item = Session.load(SessionKey.NowPlayItem);
+        const v = this.props.query.v;
+
         this.setState({
+            url: v ? v : item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             screenSize: new Point(width, height),
         });
     }
@@ -88,6 +93,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
     }
 
     render() {
+        // console.log('app.render', this.state);
         const temp = this.initGrid();
         const prevGrid = this.initGrid();
         const f1 = prevGrid.filter((v, i) => i == 0).map((g, i) => g.map(p => new Point(0, p.y)));
@@ -150,6 +156,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
                         addSearchItem={this.addSearchItem}
                         setLayout={this.setLayout}
                         closeSetting={this.closeSetting}
+                        makeLink={this.makeLink}
                         allVolumeDown={this.allVolumeDown}
                         allVolumeUp={this.allVolumeUp}
                         allStart={this.allStart}
@@ -236,6 +243,7 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
         this.setState({ layout: { x: lx, y: ly } });
     };
 
+    private makeLink = (): string => `${location.origin}?${queryString.stringify({ v: this.state.url }, { arrayFormat: 'comma' })}`;
     private allVolumeDown = () => this.setState({ bulkVolume: Math.max(this.state.bulkVolume - 10, 0) });
     private allVolumeUp = () => this.setState({ bulkVolume: Math.min(this.state.bulkVolume + 10, 100) });
     private allStart = () => this.setState({ bulkPlay: true });
@@ -243,5 +251,3 @@ class AppContainer extends React.Component<AppContainerProps, AppContainerState>
     private openSetting = () => this.setState({ setting: true });
     private closeSetting = () => this.setState({ setting: false });
 }
-
-ReactDOM.render(<AppContainer />, document.getElementById('root'));

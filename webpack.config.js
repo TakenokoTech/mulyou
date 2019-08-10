@@ -2,7 +2,8 @@ const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const entry = {
-    app: "./src/App",
+	// app: "./src/App",
+	app: "./src/Root"
 }
 
 const babelRule = {

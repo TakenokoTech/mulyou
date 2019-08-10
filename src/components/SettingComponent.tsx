@@ -1,11 +1,13 @@
 import React from 'react';
+import { TwitterIcon } from 'react-share';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Point from '../utils/Point';
 import ModalComponent from './SearchModalComponent';
 import GridModalComponent from './GridModalComponent';
 import StockModalComponent from './StockModalComponent';
 import './SettingComponent.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus, faVolumeMute, faVolumeUp, faVolumeDown, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faPlus, faVolumeMute, faVolumeUp, faVolumeDown, faPlay, faStop, faShare, faShareAlt } from '@fortawesome/free-solid-svg-icons';
 import { dom } from '../dom.extension';
 
 interface SettingComponentProps {
@@ -15,6 +17,7 @@ interface SettingComponentProps {
     addSearchItem: (item: YoutubeItem[]) => void;
     setLayout: (lx: number[], ly: number[]) => void;
     closeSetting: () => void;
+    makeLink: () => string;
     allVolumeUp: () => void;
     allVolumeDown: () => void;
     allStart: () => void;
@@ -30,7 +33,6 @@ export default class SettingComponent extends React.Component<SettingComponentPr
     }
 
     componentDidMount() {
-        console.log(this.refs.frame);
         this.frame = document.getElementById('settingPanel');
     }
 
@@ -59,21 +61,27 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                         </div>
                     </div>
                     <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px 0px' }}>
-                        <button type="button" className="btn btn-success btn-sm ml-1" onClick={this.props.allVolumeDown}>
+                        <CopyToClipboard text={this.props.makeLink()} onCopy={() => this.setState({ copied: true })}>
+                            <button type="button" className="btn btn-info btn-sm btn-icon ml-1 mr-2" onClick={this.props.makeLink}>
+                                {/* シェア */}
+                                <FontAwesomeIcon icon={faShareAlt} />
+                            </button>
+                        </CopyToClipboard>
+                        <button type="button" className="btn btn-success btn-sm btn-icon ml-1" onClick={this.props.allVolumeDown}>
                             {/* ミュート */}
-                            {'　'} <FontAwesomeIcon icon={faVolumeDown} /> {'　'}
+                            <FontAwesomeIcon icon={faVolumeDown} />
                         </button>
-                        <button type="button" className="btn btn-success btn-sm ml-1" onClick={this.props.allVolumeUp}>
+                        <button type="button" className="btn btn-success btn-sm btn-icon ml-1" onClick={this.props.allVolumeUp}>
                             {/* 音あり */}
-                            {'　'} <FontAwesomeIcon icon={faVolumeUp} /> {'　'}
+                            <FontAwesomeIcon icon={faVolumeUp} />
                         </button>
-                        <button type="button" className="btn btn-primary btn-sm ml-1" onClick={this.props.allStart}>
+                        <button type="button" className="btn btn-primary btn-sm btn-icon ml-1" onClick={this.props.allStart}>
                             {/* 全再生 */}
-                            {'　'} <FontAwesomeIcon icon={faPlay} /> {'　'}
+                            <FontAwesomeIcon icon={faPlay} />
                         </button>
-                        <button type="button" className="btn btn-primary btn-sm ml-1 mr-3" onClick={this.props.allStop}>
+                        <button type="button" className="btn btn-primary btn-sm btn-icon ml-1 mr-2" onClick={this.props.allStop}>
                             {/* 全停止 */}
-                            {'　'} <FontAwesomeIcon icon={faStop} /> {'　'}
+                            <FontAwesomeIcon icon={faStop} />
                         </button>
                         <StockModalComponent screenSize={this.props.screenSize} />
                         <GridModalComponent screenSize={this.props.screenSize} layout={this.props.layout} setLayout={this.props.setLayout} />

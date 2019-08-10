@@ -4,16 +4,16 @@
     /* height: 160px; */
     width: 96%;
     max-width: 600px;
-    background-color: #FFFE;
+    background-color: #fffe;
     z-index: 1500;
 
     border-radius: 8px;
-    color: #444
+    color: #444;
 }
 
 #setting_header {
     padding: 4px 16px;
-    color: #FFF;
+    color: #fff;
     background-color: #6c757d;
     border-radius: 8px 8px 0px 0px;
     user-select: none;
@@ -26,6 +26,11 @@
 
 #settingPanelClose {
     float: right;
-    color: #FFF;
+    color: #fff;
     background-color: #6c757d;
+}
+
+#setting_content .btn-icon {
+    height: 32px;
+    width: 44px;
 }

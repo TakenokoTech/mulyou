@@ -1,7 +1,7 @@
 import React from 'react';
 import YouTube from 'react-youtube';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faCheck, faArrowAltCircleDown, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
 import Point from '../utils/Point';
 
 interface MadiaComponentProps {
@@ -33,8 +33,8 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
     }
 
     shouldComponentUpdate(nextProps: MadiaComponentProps, nextState: MadiaComponentState, nextContext: any) {
-        if (!this.state.player) return false;
-        console.log(this.props.bulkVolume, nextProps.bulkVolume);
+        if (!this.state.player) return true;
+        // console.log(this.props.bulkVolume, nextProps.bulkVolume);
         if (this.props.bulkVolume != nextProps.bulkVolume && nextProps.bulkVolume == 0) {
             this.state.player.mute();
         }
@@ -52,7 +52,8 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
     }
 
     render() {
-        return this.props.videoId ? (
+        // console.log(this.props.height, this.props.width);
+        return (
             <div
                 className={`frame_box`}
                 style={{
@@ -60,24 +61,51 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                     top: this.props.top,
                     border: this.props.setting && this.state.selecting ? '4px solid #F00' : '4px solid #F000',
                 }}
-                key={this.props.videoId}
+                key={this.props.videoId || ''}
             >
-                <YouTube
-                    videoId={this.props.videoId}
-                    opts={{
-                        width: `${this.props.width}`,
-                        height: `${this.props.height}`,
-                        playerVars: {
-                            autoplay: 1,
-                        },
-                    }}
-                    onReady={this.onReady}
-                    onPlay={this.onPlay}
-                    onPause={this.onPause}
-                    onEnd={this.onEnd}
-                    onError={this.onError}
-                    onStateChange={this.onStateChange}
-                />
+                {this.props.videoId ? (
+                    <YouTube
+                        videoId={this.props.videoId}
+                        opts={{
+                            width: `${this.props.width}`,
+                            height: `${this.props.height}`,
+                            playerVars: {
+                                autoplay: 1,
+                            },
+                        }}
+                        onReady={this.onReady}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onEnd={this.onEnd}
+                        onError={this.onError}
+                        onStateChange={this.onStateChange}
+                    />
+                ) : (
+                    <div
+                        style={{
+                            width: `${this.props.width}`,
+                            height: `${this.props.height}`,
+                        }}
+                    >
+                        <button
+                            style={{
+                                position: 'absolute',
+                                left: '50%',
+                                top: '50%',
+                                width: '68px',
+                                height: '48px',
+                                marginLeft: '-34px',
+                                marginTop: '-24px',
+                                color: '#999',
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                            }}
+                            onClick={() => this.props.onEnd()}
+                        >
+                            <FontAwesomeIcon icon={faArrowAltCircleRight} size="3x" />
+                        </button>
+                    </div>
+                )}
                 {this.props.setting ? (
                     <>
                         <button className="close_button btn btn-danger rounded-circle p-0" style={{ zIndex: 1000 }} onClick={() => this.props.onEnd()}>
@@ -89,7 +117,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                     </>
                 ) : null}
             </div>
-        ) : null;
+        );
     }
 
     private onReady = (event: { target: any }) => {
@@ -100,7 +128,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
     };
 
     private onPlay = (event: { target: any; data: number }) => {
-        console.log('onPlay', event.target, event.data);
+        console.log('onPlay');
     };
 
     private onPause = (event: { target: any; data: number }) => {
