@@ -1,9 +1,9 @@
-// キャッシュファイルの指定
+// キャッシュファイルの指定 //
 const CACHE_NAME = 'pwa-mulyou-caches';
 const FILES_TO_CACHE = ['/index.html'];
 console.log('[ServiceWorker] loading...');
 
-// インストール処理
+// インストール処理 //
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -13,7 +13,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// リソースフェッチ時のキャッシュロード処理
+// リソースフェッチ時のキャッシュロード処理 //
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
