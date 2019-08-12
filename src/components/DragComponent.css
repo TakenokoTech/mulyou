@@ -1,0 +1,8 @@
+.drag_button {
+    position: absolute;
+    /* background-color: #FFF; */
+    width: 24px;
+    height: 24px;
+    z-index: 1000;
+    cursor: move;
+}

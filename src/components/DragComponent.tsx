@@ -2,6 +2,7 @@ import React from 'react';
 import { CustomMouseEvent } from '../dom.extension';
 import { faCog, faArrowsAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './DragComponent.css';
 
 interface DragComponentProps {
     moveXY: { ix: number | null; iy: number | null };

@@ -3,6 +3,7 @@ import YouTube from 'react-youtube';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCheck, faArrowAltCircleDown, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
 import Point from '../utils/Point';
+import './MediaComponent.css';
 
 interface MadiaComponentProps {
     screenSize: Point;
@@ -65,7 +66,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
             >
                 {this.props.videoId ? (
                     <YouTube
-                        videoId={this.props.videoId}
+                        videoId={'' /*this.props.videoId*/}
                         opts={{
                             width: `${this.props.width}`,
                             height: `${this.props.height}`,
@@ -87,21 +88,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                             height: `${this.props.height}`,
                         }}
                     >
-                        <button
-                            style={{
-                                position: 'absolute',
-                                left: '50%',
-                                top: '50%',
-                                width: '68px',
-                                height: '48px',
-                                marginLeft: '-34px',
-                                marginTop: '-24px',
-                                color: '#999',
-                                backgroundColor: 'transparent',
-                                border: 'none',
-                            }}
-                            onClick={() => this.props.onEnd()}
-                        >
+                        <button className="next_button" style={{}} onClick={() => this.props.onEnd()}>
                             <FontAwesomeIcon icon={faArrowAltCircleRight} size="3x" />
                         </button>
                     </div>

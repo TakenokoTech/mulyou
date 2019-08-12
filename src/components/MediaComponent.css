@@ -1,0 +1,39 @@
+.close_button {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    right: 24px;
+    top: 24px;
+}
+
+.select_button {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    right: 24px;
+    top: 66px;
+}
+
+.next_button {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 68px;
+    height: 48px;
+    margin-left: -34px;
+    margin-top: -24px;
+    color: #999;
+    background-color: transparent;
+    border: none;
+}
+
+.next_button:hover {
+    color: #eee;
+}
+
+.frame_box {
+    position: absolute;
+    background-color: rgb(0, 0, 0);
+    /* pointer-events: none; */
+    user-select: none;
+}
