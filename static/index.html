@@ -3,10 +3,8 @@
         <title>Multi YouTube Player</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#3bcfd4" />
-        <link rel="manifest" href="/assets/manifest.json" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js">
-            _
-        </script>
+        <link rel="manifest" href="./manifest.json" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
         <link
             rel="stylesheet"
             href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -14,6 +12,23 @@
             crossorigin="anonymous"
         />
         <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <script>
+            window.addEventListener('load', () => {
+                console.log('load.');
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker
+                        .register('./sw.js')
+                        .then(registration => {
+                            console.log('Successfully registered service worker', registration);
+                            if (typeof registration.update == 'function') registration.update();
+                        })
+                        .catch(error => {
+                            console.warn('Error whilst registering service worker', error);
+                            console.log('Error Log: ' + error);
+                        });
+                }
+            });
+        </script>
     </head>
     <body>
         <!-- <nav class="navbar navbar-dark bg-dark text-light">Sound Test</nav> -->
@@ -33,7 +48,6 @@
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"
         ></script>
-        <script src="./js/service-worker.js"></script>
         <script src="./app.bundle.js"></script>
     </body>
 </html>

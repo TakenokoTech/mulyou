@@ -32,9 +32,12 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         const gridLayout = Session.load(SessionKey.GridLayout);
         const l = gridLayout ? JSON.parse(gridLayout) : { x: [1, 1], y: [1, 1] };
 
+        const item = Session.load(SessionKey.NowPlayItem);
+        const v = this.props.query.v;
+
         this.state = {
             screenSize: new Point(0, 0),
-            url: [],
+            url: v ? v : item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             moveXY: { ix: null, iy: null },
             setting: false,
             layout: { x: l.x || [], y: l.y || [] },
@@ -69,6 +72,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
     }
 
     componentDidMount() {
+        console.log('app.componentDidMount');
         const { width: width, height: height } = dom(this.refs.frame);
         window.addEventListener('resize', () => {
             const { width: width, height: height } = dom(this.refs.frame);
@@ -77,11 +81,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
             });
         });
 
-        const item = Session.load(SessionKey.NowPlayItem);
-        const v = this.props.query.v;
-
         this.setState({
-            url: v ? v : item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             screenSize: new Point(width, height),
         });
     }

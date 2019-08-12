@@ -66,7 +66,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
             >
                 {this.props.videoId ? (
                     <YouTube
-                        videoId={'' /*this.props.videoId*/}
+                        videoId={this.props.videoId}
                         opts={{
                             width: `${this.props.width}`,
                             height: `${this.props.height}`,

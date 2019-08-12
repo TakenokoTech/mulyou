@@ -2,8 +2,8 @@ const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const entry = {
-	// app: "./src/App",
-	app: "./src/Root"
+    // app: "./src/App",
+    app: "./src/Root",
 }
 
 const babelRule = {
@@ -33,7 +33,9 @@ const development = {
         new CopyWebpackPlugin([{ from: ".", to: ".", ignore: ["!*.html"] }], { context: "static" }),
         new CopyWebpackPlugin([{ from: ".", to: "./css", ignore: ["!*.css"] }], { context: "static/css" }),
         new CopyWebpackPlugin([{ from: ".", to: "./js", ignore: ["!*.js"] }], { context: "static/js" }),
-        new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" })
+        new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" }),
+        new CopyWebpackPlugin([{ from: ".", to: "./", ignore: ["!sw.js"] }], { context: "static/" }),
+        new CopyWebpackPlugin([{ from: ".", to: "./", ignore: ["!manifest.json"] }], { context: "static/" }),
     ],
     // devServer: {
     //     public: "c72f14ca.ngrok.io",
@@ -58,7 +60,9 @@ const production = {
         new CopyWebpackPlugin([{ from: ".", to: ".", ignore: ["!*.html"] }], { context: "static" }),
         new CopyWebpackPlugin([{ from: ".", to: "./css", ignore: ["!*.css"] }], { context: "static/css" }),
         new CopyWebpackPlugin([{ from: ".", to: "./js", ignore: ["!*.js"] }], { context: "static/js" }),
-        new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" })
+        new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" }),
+        new CopyWebpackPlugin([{ from: ".", to: "./", ignore: ["!sw.js"] }], { context: "static/" }),
+        new CopyWebpackPlugin([{ from: ".", to: "./", ignore: ["!manifest.json"] }], { context: "static/" }),
     ]
 };
 
