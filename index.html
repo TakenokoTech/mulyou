@@ -17,7 +17,7 @@
                 console.log('load.');
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker
-                        .register('./js/service-worker.js')
+                        .register('./service-worker.js')
                         .then(registration => {
                             console.log('Successfully registered service worker', registration);
                             if (typeof registration.update == 'function') registration.update();
