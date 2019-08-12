@@ -1,6 +1,6 @@
 // キャッシュファイルの指定 //
 const CACHE_NAME = 'pwa-mulyou-caches';
-const FILES_TO_CACHE = ['/index.html'];
+const FILES_TO_CACHE = ['./index.html'];
 console.log('[ServiceWorker] loading...');
 
 // インストール処理 //
