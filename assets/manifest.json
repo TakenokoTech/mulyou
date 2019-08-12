@@ -4,7 +4,7 @@
     "theme_color": "#3bcfd4",
     "background_color": "#3bcfd4",
     "display": "fullscreen",
-    "Scope": "/",
+    "Scope": "/mulyou",
     "start_url": "/mulyou",
     "icons": [
         {
