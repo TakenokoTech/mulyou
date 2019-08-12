@@ -1,33 +1,86 @@
 #settingPanel {
-    position: absolute;
-    bottom: 16px;
-    /* height: 160px; */
-    width: 96%;
-    max-width: 600px;
-    background-color: #fffe;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
     z-index: 1500;
-
-    border-radius: 8px;
+    /* height: 160px; */
+    /* max-width: 600px; */
+    /* border-radius: 8px; */
     color: #444;
+    transition: .2s ease-in-out;
+}
+
+#settingPanel.enable {
+    background-color: #f8f9fa;
+    -webkit-transform: translateY(0%);
+    transform: translateY(0%);
+}
+
+#settingPanel.disable {
+    background-color: transparent;
+    -webkit-transform: translateY(100%);
+    transform: translateY(100%);
+    bottom: 48px;
 }
 
 #setting_header {
     padding: 4px 16px;
     color: #fff;
-    background-color: #6c757d;
-    border-radius: 8px 8px 0px 0px;
     user-select: none;
     cursor: move;
+    /* background-color: #6c757d; */
+    /* border-radius: 8px 8px 0px 0px; */
+    /* display: none; */
+}
+
+#settingPanel.disable #setting_header {
+    background-color: transparent
 }
 
 #setting_content {
-    padding: 16px;
+    position: relative;
+    padding: 16px 16px;
+    max-width: 600px;
+    max-height: 600;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+#settingPanel.disable #setting_content {
+    /* max-height: 0px; */
+    padding: 0px;
+    opacity: 0;
 }
 
 #settingPanelClose {
-    float: right;
+    position: relative;
+    width: 60px;
+    left: 50%;
+    padding: 8px;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    background-color: transparent;
+    border: none;
+    user-select: none;
+}
+
+#settingPanelClose:hover {
+    background-color: #0002;
+}
+
+
+#settingPanelClose:focus {
+    box-shadow: none;
+}
+
+#settingPanel.disable #settingPanelClose {
+    height: 48px;
     color: #fff;
-    background-color: #6c757d;
+}
+
+#settingPanel.disable #settingPanelClose:hover {
+    background-color: #EEE2;
 }
 
 #setting_content .btn-icon {

@@ -1,4 +1,5 @@
 const path = require("path");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const entry = {
@@ -21,7 +22,7 @@ const development = {
     entry: entry,
     output: {
         path: path.resolve(__dirname, "dev-dist"),
-        filename: "[name].bundle.js"
+        filename: "[name].bundle.js?[hash]"
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js", ".json"]
@@ -30,7 +31,8 @@ const development = {
         rules: [babelRule, cssRule]
     },
     plugins: [
-        new CopyWebpackPlugin([{ from: ".", to: ".", ignore: ["!*.html"] }], { context: "static" }),
+        new HtmlWebpackPlugin({ template: "./static/index.html" }),
+        // new CopyWebpackPlugin([{ from: ".", to: ".", ignore: ["!*.html"] }], { context: "static" }),
         new CopyWebpackPlugin([{ from: ".", to: "./css", ignore: ["!*.css"] }], { context: "static/css" }),
         new CopyWebpackPlugin([{ from: ".", to: "./js", ignore: ["!*.js"] }], { context: "static/js" }),
         new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" }),
@@ -57,7 +59,8 @@ const production = {
         rules: [babelRule, cssRule]
     },
     plugins: [
-        new CopyWebpackPlugin([{ from: ".", to: ".", ignore: ["!*.html"] }], { context: "static" }),
+        new HtmlWebpackPlugin({ template: "./static/index.html" }),
+        // new CopyWebpackPlugin([{ from: ".", to: ".", ignore: ["!*.html"] }], { context: "static" }),
         new CopyWebpackPlugin([{ from: ".", to: "./css", ignore: ["!*.css"] }], { context: "static/css" }),
         new CopyWebpackPlugin([{ from: ".", to: "./js", ignore: ["!*.js"] }], { context: "static/js" }),
         new CopyWebpackPlugin([{ from: ".", to: "./assets", ignore: ["!*"] }], { context: "static/assets" }),

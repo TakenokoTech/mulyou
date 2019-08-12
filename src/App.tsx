@@ -82,7 +82,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         });
 
         this.setState({
-            screenSize: new Point(width, height),
+            screenSize: new Point(width, height - 32),
         });
     }
 
@@ -148,21 +148,21 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
                     });
                 })}
                 {this.state.setting ? <div id="drag_view" style={{ cursor: dragging ? 'move' : '' }} onMouseMove={e => this.onMove(e)} /> : null}
-                {this.state.setting ? (
-                    <SettingComponent
-                        screenSize={this.state.screenSize}
-                        layout={this.state.layout}
-                        addInputItem={this.addInputItem}
-                        addSearchItem={this.addSearchItem}
-                        setLayout={this.setLayout}
-                        closeSetting={this.closeSetting}
-                        makeLink={this.makeLink}
-                        allVolumeDown={this.allVolumeDown}
-                        allVolumeUp={this.allVolumeUp}
-                        allStart={this.allStart}
-                        allStop={this.allStop}
-                    />
-                ) : null}
+                <SettingComponent
+                    screenSize={this.state.screenSize}
+                    enable={this.state.setting}
+                    layout={this.state.layout}
+                    addInputItem={this.addInputItem}
+                    addSearchItem={this.addSearchItem}
+                    setLayout={this.setLayout}
+                    openSetting={this.openSetting}
+                    closeSetting={this.closeSetting}
+                    makeLink={this.makeLink}
+                    allVolumeDown={this.allVolumeDown}
+                    allVolumeUp={this.allVolumeUp}
+                    allStart={this.allStart}
+                    allStop={this.allStop}
+                />
             </div>
         );
     }

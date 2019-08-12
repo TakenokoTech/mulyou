@@ -6,7 +6,8 @@
 }
 
 .app-container {
-    background-color: #282c34;
+    /* background-color: #282c34; */
+    background-color: black;
     min-height: 100vh;
     display: flex;
     flex-direction: column;

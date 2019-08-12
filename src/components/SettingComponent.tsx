@@ -7,15 +7,29 @@ import GridModalComponent from './GridModalComponent';
 import StockModalComponent from './StockModalComponent';
 import './SettingComponent.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus, faVolumeMute, faVolumeUp, faVolumeDown, faPlay, faStop, faShare, faShareAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+    faTimes,
+    faPlus,
+    faVolumeMute,
+    faVolumeUp,
+    faVolumeDown,
+    faPlay,
+    faStop,
+    faShare,
+    faShareAlt,
+    faChevronUp,
+    faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
 import { dom } from '../dom.extension';
 
 interface SettingComponentProps {
     screenSize: Point;
+    enable: boolean;
     layout: { x: number[]; y: number[] };
     addInputItem: (value: string) => void;
     addSearchItem: (item: YoutubeItem[]) => void;
     setLayout: (lx: number[], ly: number[]) => void;
+    openSetting: () => void;
     closeSetting: () => void;
     makeLink: () => string;
     allVolumeUp: () => void;
@@ -38,11 +52,23 @@ export default class SettingComponent extends React.Component<SettingComponentPr
 
     render() {
         return (
-            <div id="settingPanel" ref="frame">
-                <div id="setting_header" onMouseDown={this.mouseDown} onMouseUp={this.mouseUp} onMouseLeave={this.mouseUp} onMouseMove={this.onMove}>
-                    設定
-                    <button id="settingPanelClose" className="btn btn-light btn-sm" onClick={this.props.closeSetting}>
-                        <FontAwesomeIcon icon={faTimes} />
+            <div id="settingPanel" className={this.props.enable ? `enable` : `disable`} ref="frame">
+                <div
+                    id="setting_header"
+                    className={this.props.enable ? `enable` : `disable`}
+                    onMouseDown={this.mouseDown}
+                    onMouseUp={this.mouseUp}
+                    onMouseLeave={this.mouseUp}
+                    onMouseMove={this.onMove}
+                >
+                    <button
+                        id="settingPanelClose"
+                        className="btn btn-light btn-sm"
+                        onClick={() => {
+                            this.props.enable ? this.props.closeSetting() : this.props.openSetting();
+                        }}
+                    >
+                        {this.props.enable ? <FontAwesomeIcon icon={faChevronDown} /> : <FontAwesomeIcon icon={faChevronUp} />}
                     </button>
                 </div>
                 <div id="setting_content">
@@ -97,14 +123,14 @@ export default class SettingComponent extends React.Component<SettingComponentPr
 
     mouseDown = (e: any) => {
         console.log('mouseDown');
-        this.dragging = true;
-        this.offsetX = e.pageX;
-        this.offsetY = e.pageY;
+        // this.dragging = true;
+        // this.offsetX = e.pageX;
+        // this.offsetY = e.pageY;
     };
 
     mouseUp = (e: any) => {
         console.log('mouseUp');
-        this.dragging = false;
+        // this.dragging = false;
     };
 
     onMove = (e: any) => {
