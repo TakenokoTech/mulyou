@@ -1,7 +1,7 @@
 {
     "name": "Multi YouTube Player",
     "short_name": "mulyou",
-    "theme_color": "#3bcfd4",
+    "theme_color": "#000",
     "background_color": "#3bcfd4",
     "display": "standalone",
     "start_url": "./index.html",
