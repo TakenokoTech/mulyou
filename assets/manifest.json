@@ -4,7 +4,7 @@
     "theme_color": "#3bcfd4",
     "background_color": "#3bcfd4",
     "display": "fullscreen",
-    "start_url": "https://takenokotech.github.io/mulyou/",
+    "start_url": "/",
     "icons": [
         {
             "src": "images/icons/icon-72x72.png",
