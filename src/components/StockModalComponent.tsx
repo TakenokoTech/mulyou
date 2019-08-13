@@ -18,14 +18,17 @@ export default class StockModalComponent extends React.Component<StockModalCompo
         this.state = { stock: [], select: [] };
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+        $('#stockModal').on('shown.bs.modal', (e: any) => {
+            const h = Session.load(SessionKey.HistoryItem);
+            let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
+            this.setState({ stock: stock });
+        });
+    }
 
     render() {
         return (
             <>
-                <button type="button" className="btn btn-info btn-sm ml-1" onClick={this.show}>
-                    ストック
-                </button>
                 <div className="modal fade" id="stockModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content">
@@ -78,13 +81,6 @@ export default class StockModalComponent extends React.Component<StockModalCompo
             </>
         );
     }
-
-    show = () => {
-        const h = Session.load(SessionKey.HistoryItem);
-        let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
-        this.setState({ stock: stock });
-        $('#stockModal').modal('show');
-    };
 
     private selectItem = (item: YoutubeItem) => {
         let select = this.state.select;

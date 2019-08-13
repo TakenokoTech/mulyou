@@ -2,7 +2,8 @@
     position: absolute;
     width: 32px;
     height: 32px;
-    right: 24px;
+    right: 8px;
+    /* right: 24px; */
     top: 24px;
 }
 
@@ -10,8 +11,10 @@
     position: absolute;
     width: 32px;
     height: 32px;
-    right: 24px;
-    top: 66px;
+    right: 48px;
+    top: 24px;
+    /* right: 24px; */
+    /* top: 66px; */
 }
 
 .next_button {
@@ -36,4 +39,34 @@
     background-color: rgb(0, 0, 0);
     /* pointer-events: none; */
     user-select: none;
+}
+
+.close_triangle_button {
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: 0px;
+    right: 0px;
+    border-style: solid;
+    /* border-width: 0 48px 48px 0; */
+    /* border-color: transparent #dc3545 transparent transparent; */
+    /* background-color: transparent; */
+    opacity: .8;
+    color: white;
+    padding: 0px;
+    border-color: transparent;
+    background-color: #dc3545;
+    width: 48px;
+    height: 48px;
+    border-radius: 0% 0% 0% 100%;
+}
+
+.close_triangle_button:hover {
+    opacity: .5;
+}
+
+.close_triangle_button svg {
+    position: absolute;
+    left: 24px;
+    top: 4px;
 }

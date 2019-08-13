@@ -34,85 +34,68 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
 
     render() {
         return (
-            <div>
-                <button
-                    type="button"
-                    className="btn btn-info ml-1"
-                    onClick={() => {
-                        $('#searchModal').modal('show');
-                    }}
-                >
-                    検索
-                </button>
-                <div className="modal fade" id="searchModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div className="modal-dialog modal-lg" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">
-                                    コンテンツ検索
-                                </h5>
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div className="modal-body">
-                                <div className="input-group">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        ref="searchText"
-                                        placeholder="チャンネル名, 動画名, etc..."
-                                        aria-label="Video ID"
-                                    />
-                                    <div className="input-group-append">
-                                        <button className="btn btn-outline-secondary" type="button" onClick={e => this.search(e)}>
-                                            検索
-                                        </button>
-                                    </div>
+            <div className="modal fade" id="searchModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog modal-lg" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="exampleModalLabel">
+                                コンテンツ検索
+                            </h5>
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="input-group">
+                                <input type="text" className="form-control" ref="searchText" placeholder="チャンネル名, 動画名, etc..." aria-label="Video ID" />
+                                <div className="input-group-append">
+                                    <button className="btn btn-outline-secondary" type="button" onClick={e => this.search(e)}>
+                                        検索
+                                    </button>
                                 </div>
-                                <ul className="list-unstyled" style={{ height: this.props.screenSize.y * 0.7, overflowY: 'scroll' }}>
-                                    {this.state.result
-                                        ? this.state.result.map((item, i) => {
-                                              return (
-                                                  <li key={i} className="media my-4" onClick={() => this.selectItem(item)} style={{ cursor: 'pointer' }}>
-                                                      <img
-                                                          className="mr-3"
-                                                          src={item.snippet.thumbnails.high.url}
-                                                          alt="Generic placeholder image"
-                                                          width="120"
-                                                          style={{
-                                                              border:
-                                                                  this.state.select.map(i => i.id.videoId).indexOf(item.id.videoId) > -1
-                                                                      ? '4px solid #FF0000CC'
-                                                                      : '4px solid #FF000000',
-                                                          }}
-                                                      />
-                                                      <div className="media-body">
-                                                          <b>{item.snippet.title}</b>
-                                                          <br />
-                                                          {item.snippet.description}
-                                                      </div>
-                                                  </li>
-                                              );
-                                          })
-                                        : null}
-                                    {this.state.history.q != '' ? (
-                                        <li className="media my-4">
-                                            <button className="btn mx-auto" onClick={this.next}>
-                                                Next
-                                            </button>
-                                        </li>
-                                    ) : null}
-                                </ul>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-dismiss="modal">
-                                    Close
-                                </button>
-                                <button type="button" className="btn btn-primary" onClick={this.add}>
-                                    Add
-                                </button>
-                            </div>
+                            <ul className="list-unstyled" style={{ height: this.props.screenSize.y * 0.7, overflowY: 'scroll' }}>
+                                {this.state.result
+                                    ? this.state.result.map((item, i) => {
+                                          return (
+                                              <li key={i} className="media my-4" onClick={() => this.selectItem(item)} style={{ cursor: 'pointer' }}>
+                                                  <img
+                                                      className="mr-3"
+                                                      src={item.snippet.thumbnails.high.url}
+                                                      alt="Generic placeholder image"
+                                                      width="120"
+                                                      style={{
+                                                          border:
+                                                              this.state.select.map(i => i.id.videoId).indexOf(item.id.videoId) > -1
+                                                                  ? '4px solid #FF0000CC'
+                                                                  : '4px solid #FF000000',
+                                                      }}
+                                                  />
+                                                  <div className="media-body">
+                                                      <b>{item.snippet.title}</b>
+                                                      <br />
+                                                      {item.snippet.description}
+                                                  </div>
+                                              </li>
+                                          );
+                                      })
+                                    : null}
+                                {this.state.history.q != '' ? (
+                                    <li className="media my-4">
+                                        <button className="btn mx-auto" onClick={this.next}>
+                                            Next
+                                        </button>
+                                    </li>
+                                ) : null}
+                            </ul>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" className="btn btn-primary" onClick={this.add}>
+                                Add
+                            </button>
                         </div>
                     </div>
                 </div>

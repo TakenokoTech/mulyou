@@ -34,6 +34,12 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         this.canvasContext = (this.refs.canvas as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
         this.renderCanvas();
         this.handlerCanvas();
+
+        $('#gridModal').on('shown.bs.modal', (e: any) => {
+            const { width: width, height: height } = dom(this.refs.canvasFrame);
+            this.setState({ canvasFrameSize: new Point(width - 32, height - 32) });
+            this.renderCanvas();
+        });
     }
 
     shouldComponentUpdate(nextProps: GridModalComponentProps, nextState: GridModalComponentState, nextContext: any) {
@@ -47,9 +53,6 @@ export default class GridModalComponent extends React.Component<GridModalCompone
     render() {
         return (
             <>
-                <button type="button" className="btn btn-info btn-sm ml-1" onClick={this.showModal}>
-                    グリッド
-                </button>
                 <div className="modal fade" id="gridModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-lg" role="document">
                         <div className="modal-content">
@@ -249,15 +252,6 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             this.object.selectIndex = -1;
         }
         this.renderCanvas();
-    };
-
-    showModal = () => {
-        $('#gridModal').modal('show');
-        $('#gridModal').on('shown.bs.modal', (e: any) => {
-            const { width: width, height: height } = dom(this.refs.canvasFrame);
-            this.setState({ canvasFrameSize: new Point(width - 32, height - 32) });
-            this.renderCanvas();
-        });
     };
 
     hideModal = () => {

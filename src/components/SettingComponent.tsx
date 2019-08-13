@@ -21,6 +21,7 @@ import {
     faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { dom } from '../dom.extension';
+import Session, { SessionKey } from '../utils/Session';
 
 interface SettingComponentProps {
     screenSize: Point;
@@ -38,12 +39,16 @@ interface SettingComponentProps {
     allStop: () => void;
 }
 
-interface SettingComponentState {}
+interface SettingComponentState {
+    clipurl: string;
+    copied: boolean;
+}
 
 export default class SettingComponent extends React.Component<SettingComponentProps, SettingComponentState> {
     frame: HTMLElement | null = null;
     constructor(props: SettingComponentProps) {
         super(props);
+        this.state = { clipurl: '', copied: false };
     }
 
     componentDidMount() {
@@ -52,68 +57,93 @@ export default class SettingComponent extends React.Component<SettingComponentPr
 
     render() {
         return (
-            <div id="settingPanel" className={this.props.enable ? `enable` : `disable`} ref="frame">
-                <div
-                    id="setting_header"
-                    className={this.props.enable ? `enable` : `disable`}
-                    onMouseDown={this.mouseDown}
-                    onMouseUp={this.mouseUp}
-                    onMouseLeave={this.mouseUp}
-                    onMouseMove={this.onMove}
-                >
-                    <button
-                        id="settingPanelClose"
-                        className="btn btn-light btn-sm"
-                        onClick={() => {
-                            this.props.enable ? this.props.closeSetting() : this.props.openSetting();
-                        }}
+            <>
+                <div id="settingPanel" className={this.props.enable ? `enable` : `disable`} ref="frame">
+                    <div
+                        id="setting_header"
+                        className={this.props.enable ? `enable` : `disable`}
+                        onMouseDown={this.mouseDown}
+                        onMouseUp={this.mouseUp}
+                        onMouseLeave={this.mouseUp}
+                        onMouseMove={this.onMove}
                     >
-                        {this.props.enable ? <FontAwesomeIcon icon={faChevronDown} /> : <FontAwesomeIcon icon={faChevronUp} />}
-                    </button>
-                </div>
-                <div id="setting_content">
-                    <div className="input-group">
-                        <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
-                        <div className="input-group-append">
-                            <button
-                                className="btn btn-outline-secondary"
-                                type="button"
-                                onClick={e => this.props.addInputItem((this.refs.inputVideo as HTMLInputElement).value)}
+                        <button
+                            id="settingPanelClose"
+                            className="btn btn-light btn-sm"
+                            onClick={() => {
+                                this.props.enable ? this.props.closeSetting() : this.props.openSetting();
+                            }}
+                        >
+                            {this.props.enable ? <FontAwesomeIcon icon={faChevronDown} /> : <FontAwesomeIcon icon={faChevronUp} />}
+                        </button>
+                    </div>
+                    <div id="setting_content">
+                        <div className="input-group">
+                            <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
+                            <div className="input-group-append">
+                                <button
+                                    className="btn btn-outline-secondary"
+                                    type="button"
+                                    onClick={e => this.props.addInputItem((this.refs.inputVideo as HTMLInputElement).value)}
+                                >
+                                    {/* ADD　 */}
+                                    <FontAwesomeIcon icon={faPlus} />
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" className="btn btn-info ml-1" onClick={this.showSearch}>
+                                    検索
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px 0px' }}>
+                            <CopyToClipboard
+                                text={this.state.clipurl}
+                                onCopy={() => {
+                                    alert(`[コピーしました]\n${this.props.makeLink()}`);
+                                    this.setState({ copied: true });
+                                }}
                             >
-                                {/* ADD　 */}
-                                <FontAwesomeIcon icon={faPlus} />
+                                <button
+                                    type="button"
+                                    className="btn btn-info btn-sm btn-icon ml-1 mr-2"
+                                    onClick={() => this.setState({ clipurl: this.props.makeLink() })}
+                                >
+                                    {/* シェア */}
+                                    <FontAwesomeIcon icon={faShareAlt} />
+                                </button>
+                            </CopyToClipboard>
+                            <button type="button" className="btn btn-success btn-sm btn-icon ml-1" onClick={this.props.allVolumeDown}>
+                                {/* ミュート */}
+                                <FontAwesomeIcon icon={faVolumeDown} />
                             </button>
-                            <ModalComponent screenSize={this.props.screenSize} addItem={this.props.addSearchItem} />
+                            <button type="button" className="btn btn-success btn-sm btn-icon ml-1" onClick={this.props.allVolumeUp}>
+                                {/* 音あり */}
+                                <FontAwesomeIcon icon={faVolumeUp} />
+                            </button>
+                            <button type="button" className="btn btn-primary btn-sm btn-icon ml-1" onClick={this.props.allStart}>
+                                {/* 全再生 */}
+                                <FontAwesomeIcon icon={faPlay} />
+                            </button>
+                            <button type="button" className="btn btn-primary btn-sm btn-icon ml-1 mr-2" onClick={this.props.allStop}>
+                                {/* 全停止 */}
+                                <FontAwesomeIcon icon={faStop} />
+                            </button>
+                            <button type="button" className="btn btn-info btn-sm ml-1" onClick={this.showStock}>
+                                ストック
+                            </button>
+                            <button type="button" className="btn btn-info btn-sm ml-1" onClick={this.showGrid}>
+                                グリッド
+                            </button>
                         </div>
                     </div>
-                    <div style={{ fontSize: '18px', textAlign: 'right', padding: '8px 0px' }}>
-                        <CopyToClipboard text={this.props.makeLink()} onCopy={() => this.setState({ copied: true })}>
-                            <button type="button" className="btn btn-info btn-sm btn-icon ml-1 mr-2" onClick={this.props.makeLink}>
-                                {/* シェア */}
-                                <FontAwesomeIcon icon={faShareAlt} />
-                            </button>
-                        </CopyToClipboard>
-                        <button type="button" className="btn btn-success btn-sm btn-icon ml-1" onClick={this.props.allVolumeDown}>
-                            {/* ミュート */}
-                            <FontAwesomeIcon icon={faVolumeDown} />
-                        </button>
-                        <button type="button" className="btn btn-success btn-sm btn-icon ml-1" onClick={this.props.allVolumeUp}>
-                            {/* 音あり */}
-                            <FontAwesomeIcon icon={faVolumeUp} />
-                        </button>
-                        <button type="button" className="btn btn-primary btn-sm btn-icon ml-1" onClick={this.props.allStart}>
-                            {/* 全再生 */}
-                            <FontAwesomeIcon icon={faPlay} />
-                        </button>
-                        <button type="button" className="btn btn-primary btn-sm btn-icon ml-1 mr-2" onClick={this.props.allStop}>
-                            {/* 全停止 */}
-                            <FontAwesomeIcon icon={faStop} />
-                        </button>
-                        <StockModalComponent screenSize={this.props.screenSize} />
-                        <GridModalComponent screenSize={this.props.screenSize} layout={this.props.layout} setLayout={this.props.setLayout} />
-                    </div>
                 </div>
-            </div>
+                <div>
+                    <ModalComponent screenSize={this.props.screenSize} addItem={this.props.addSearchItem} />
+                    <StockModalComponent screenSize={this.props.screenSize} />
+                    <GridModalComponent screenSize={this.props.screenSize} layout={this.props.layout} setLayout={this.props.setLayout} />
+                </div>
+            </>
         );
     }
 
@@ -143,5 +173,17 @@ export default class SettingComponent extends React.Component<SettingComponentPr
             this.frame && (this.frame.style.top = this.frame.offsetTop + y + 'px');
             this.frame && (this.frame.style.left = this.frame.offsetLeft + x + 'px');
         }
+    };
+
+    showSearch = () => {
+        $('#searchModal').modal('show');
+    };
+
+    showStock = () => {
+        $('#stockModal').modal('show');
+    };
+
+    showGrid = () => {
+        $('#gridModal').modal('show');
     };
 }
