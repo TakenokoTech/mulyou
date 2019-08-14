@@ -15,7 +15,11 @@ const babelRule = {
 
 const cssRule = {
     test: /\.css/,
-    use: ["style-loader", { loader: "css-loader", options: { url: false } }]
+    use: [
+        "style-loader",
+        { loader: "css-loader", options: { url: false } },
+        { loader: "postcss-loader", options: { sourceMap: true, plugins: [require("autoprefixer")({ grid: true })] } }
+    ]
 }
 
 const development = {

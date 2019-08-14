@@ -131,7 +131,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
                 {temp.map((g, x) => {
                     return g.map((p, y) => {
                         const dragging = x == this.state.moveXY.ix && y == this.state.moveXY.iy;
-                        return p.x == 0 || p.y == 0 ? null : (
+                        return p.x == 0 || p.y == 0 || !this.state.setting ? null : (
                             <DragComponent
                                 moveXY={this.state.moveXY}
                                 indexX={x}
@@ -140,7 +140,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
                                 dragKey={`drag${x}${y}`}
                                 left={p.x - 12}
                                 top={p.y - 12}
-                                color={dragging ? '#FF03' : '#FFF3'}
+                                color={dragging ? '#FF01' : '#FFF1'}
                                 onEventChange={this.onEventChange}
                                 onMove={this.onMove}
                             />
