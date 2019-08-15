@@ -39,7 +39,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
             screenSize: new Point(0, 0),
             url: v ? v : item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             moveXY: { ix: null, iy: null },
-            setting: false,
+            setting: true,
             layout: { x: l.x || [], y: l.y || [] },
             bulkPlay: false,
             bulkVolume: 0,
@@ -75,6 +75,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         console.log('app.componentDidMount');
         const { width: width, height: height } = dom(this.refs.frame);
         window.addEventListener('resize', () => {
+            console.log('resize');
             const { width: width, height: height } = dom(this.refs.frame);
             this.setState({
                 screenSize: new Point(width, height),
@@ -168,7 +169,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
     }
 
     private getWidth(x: number, y: number, grid: Point[][], displayWidth: number): number {
-        return grid[x + 1] ? grid[x + 1][y].x - grid[x][y].x : displayWidth - grid[x][y].x;
+        return grid[x + 1] && grid[x + 1].length > 0 ? grid[x + 1][y].x - grid[x][y].x : displayWidth - grid[x][y].x;
     }
 
     private getHeight(x: number, y: number, grid: Point[][], displayHeight: number): number {

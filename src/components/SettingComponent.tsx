@@ -2,7 +2,7 @@ import React from 'react';
 import { TwitterIcon } from 'react-share';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Point from '../utils/Point';
-import ModalComponent from './SearchModalComponent';
+import SearchModalComponent from './SearchModalComponent';
 import GridModalComponent from './GridModalComponent';
 import StockModalComponent from './StockModalComponent';
 import './SettingComponent.css';
@@ -19,6 +19,7 @@ import {
     faShareAlt,
     faChevronUp,
     faChevronDown,
+    faChevronLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { dom } from '../dom.extension';
 import Session, { SessionKey } from '../utils/Session';
@@ -42,13 +43,16 @@ interface SettingComponentProps {
 interface SettingComponentState {
     clipurl: string;
     copied: boolean;
+    searchEnable: boolean;
+    stockEnable: boolean;
+    gridEnable: boolean;
 }
 
 export default class SettingComponent extends React.Component<SettingComponentProps, SettingComponentState> {
     frame: HTMLElement | null = null;
     constructor(props: SettingComponentProps) {
         super(props);
-        this.state = { clipurl: '', copied: false };
+        this.state = { clipurl: '', copied: false, searchEnable: false, stockEnable: false, gridEnable: false };
     }
 
     componentDidMount() {
@@ -138,14 +142,50 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                         </div>
                     </div>
                 </div>
-                <div>
-                    <ModalComponent screenSize={this.props.screenSize} addItem={this.props.addSearchItem} />
-                    <StockModalComponent screenSize={this.props.screenSize} />
-                    <GridModalComponent screenSize={this.props.screenSize} layout={this.props.layout} setLayout={this.props.setLayout} />
+                <>
+                    <SearchModalComponent
+                        screenSize={this.props.screenSize}
+                        addItem={this.props.addSearchItem}
+                        enable={this.state.searchEnable}
+                        close={() => this.setState({ searchEnable: false })}
+                    />
+                    <StockModalComponent
+                        screenSize={this.props.screenSize}
+                        enable={this.state.stockEnable}
+                        close={() => this.setState({ stockEnable: false })}
+                    />
+                    <GridModalComponent
+                        screenSize={this.props.screenSize}
+                        layout={this.props.layout}
+                        setLayout={this.props.setLayout}
+                        enable={this.state.gridEnable}
+                        close={() => this.setState({ gridEnable: false })}
+                    />
+                </>
+                {/*
+                <div className={'setting-frame ' + (this.props.enable ? 'enable' : 'disable')}>
+                    <div className={'setting-overlay'} onClick={this.switchSetting} />
+                    <div className="setting-base" onClick={() => {}}>
+                        <button type="button" className="btn btn-icon setting-header-btn" onClick={this.switchSetting}>
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </button>
+                        <div className="setting-header">Header</div>
+                        <div className="setting-content">Header</div>
+                        <div className="setting-footer">
+                            <button type="button" className="btn btn-danger" onClick={this.switchSetting}>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
                 </div>
+                */}
             </>
         );
     }
+
+    switchSetting = () => {
+        this.props.enable ? this.props.closeSetting() : this.props.openSetting();
+    };
 
     dragging: boolean = false;
     offsetX: number | null = null;
@@ -176,14 +216,14 @@ export default class SettingComponent extends React.Component<SettingComponentPr
     };
 
     showSearch = () => {
-        $('#searchModal').modal('show');
+        this.setState({ searchEnable: true });
     };
 
     showStock = () => {
-        $('#stockModal').modal('show');
+        this.setState({ stockEnable: true });
     };
 
     showGrid = () => {
-        $('#gridModal').modal('show');
+        this.setState({ gridEnable: true });
     };
 }

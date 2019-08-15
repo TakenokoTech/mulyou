@@ -2,9 +2,13 @@ import React from 'react';
 import Session, { SessionKey } from '../utils/Session';
 import Point from '../utils/Point';
 import * as YoutubeApi from '../repository/YoutubeApi';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 interface StockModalComponentProps {
     screenSize: Point;
+    enable: boolean;
+    close: () => void;
 }
 
 interface StockModalComponentState {
@@ -18,71 +22,66 @@ export default class StockModalComponent extends React.Component<StockModalCompo
         this.state = { stock: [], select: [] };
     }
 
-    componentDidMount() {
-        $('#stockModal').on('shown.bs.modal', (e: any) => {
-            const h = Session.load(SessionKey.HistoryItem);
-            let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
-            this.setState({ stock: stock });
-        });
+    componentDidMount() {}
+
+    shouldComponentUpdate(nextProps: StockModalComponentProps, nextState: StockModalComponentState, nextContext: any) {
+        const h = Session.load(SessionKey.HistoryItem);
+        let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
+        nextState.stock = stock;
+        return true;
     }
 
     render() {
         return (
-            <>
-                <div className="modal fade" id="stockModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div className="modal-dialog modal-lg" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">
-                                    ストック一覧
-                                </h5>
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div className="modal-body">
-                                <ul className="list-unstyled" style={{ height: this.props.screenSize.y * 0.7, overflowY: 'scroll' }}>
-                                    {this.state.stock.map((item, i) => {
-                                        return (
-                                            <li key={i} className="media my-4" onClick={() => this.selectItem(item)} style={{ cursor: 'pointer' }}>
-                                                <img
-                                                    className="mr-3"
-                                                    src={item.snippet.thumbnails.high.url}
-                                                    alt="Generic placeholder image"
-                                                    width="120"
-                                                    style={{
-                                                        border:
-                                                            this.state.select.map(i => i.id.videoId).indexOf(item.id.videoId) > -1
-                                                                ? '4px solid #FF0000CC'
-                                                                : '4px solid #FF000000',
-                                                    }}
-                                                />
-                                                <div className="media-body" style={{ textAlign: 'left' }}>
-                                                    <b>{item.snippet.title}</b>
-                                                    <br />
-                                                    {item.snippet.description}
-                                                </div>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-danger" onClick={e => this.deleteStock()}>
-                                    Delete
-                                </button>
-                                <button type="button" className="btn btn-secondary" data-dismiss="modal">
-                                    Close
-                                </button>
-                            </div>
-                        </div>
+            <div className={'setting-frame ' + (this.props.enable ? 'enable' : 'disable')}>
+                <div className={'setting-overlay'} onClick={this.props.close} />
+                <div className="setting-base" onClick={() => {}}>
+                    <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                    </button>
+                    <div className="setting-header">ストック一覧</div>
+                    <div className="setting-content">
+                        <ul className="list-unstyled">
+                            {this.state.stock.map((item, i) => {
+                                return (
+                                    <li key={i} className="media my-4" onClick={() => this.selectItem(item)} style={{ cursor: 'pointer' }}>
+                                        <img
+                                            className="mr-3"
+                                            src={item.snippet.thumbnails.high.url}
+                                            alt="Generic placeholder image"
+                                            width="120"
+                                            style={{
+                                                border:
+                                                    this.state.select.map(i => i.id.videoId).indexOf(item.id.videoId) > -1
+                                                        ? '4px solid #FF0000CC'
+                                                        : '4px solid #FF000000',
+                                            }}
+                                        />
+                                        <div className="media-body" style={{ textAlign: 'left' }}>
+                                            <b>{item.snippet.title}</b>
+                                            <br />
+                                            {item.snippet.description}
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                    <div className="setting-footer">
+                        <button type="button" className="btn btn-secondary ml-1" style={{ width: '80px' }} onClick={this.props.close}>
+                            {'Close'}
+                        </button>
+                        <button type="button" className="btn btn-danger ml-1" style={{ width: '80px' }} onClick={e => this.deleteStock()}>
+                            {'Delete'}
+                        </button>
                     </div>
                 </div>
-            </>
+            </div>
         );
     }
 
     private selectItem = (item: YoutubeItem) => {
+        console.log('selete');
         let select = this.state.select;
         if (select.map(i => i.id).indexOf(item.id) > -1) {
             select = select.filter(i => i.id != item.id);
@@ -97,7 +96,7 @@ export default class StockModalComponent extends React.Component<StockModalCompo
     private deleteStock = () => {
         let stock = this.state.stock;
         let select = this.state.select;
-        stock = stock.filter(i => select.indexOf(i) == -1);
+        stock = stock.filter(i => select.map(s => s.id.videoId).indexOf(i.id.videoId) == -1);
         Session.save(SessionKey.HistoryItem, JSON.stringify(stock));
         this.setState({
             stock: stock,

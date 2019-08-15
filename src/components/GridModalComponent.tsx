@@ -2,11 +2,15 @@ import React from 'react';
 import Point from '../utils/Point';
 import './GridModalComponent.css';
 import { dom } from '../dom.extension';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 interface GridModalComponentProps {
     screenSize: Point;
     layout: { x: number[]; y: number[] };
     setLayout: (lx: number[], ly: number[]) => void;
+    enable: boolean;
+    close: () => void;
 }
 
 interface GridModalComponentState {
@@ -31,15 +35,11 @@ export default class GridModalComponent extends React.Component<GridModalCompone
     }
 
     componentDidMount() {
+        const { width: width, height: height } = dom(this.refs.canvasFrame);
+        this.setState({ canvasFrameSize: new Point(width - 60, height - 60) });
         this.canvasContext = (this.refs.canvas as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
         this.renderCanvas();
         this.handlerCanvas();
-
-        $('#gridModal').on('shown.bs.modal', (e: any) => {
-            const { width: width, height: height } = dom(this.refs.canvasFrame);
-            this.setState({ canvasFrameSize: new Point(width - 32, height - 32) });
-            this.renderCanvas();
-        });
     }
 
     shouldComponentUpdate(nextProps: GridModalComponentProps, nextState: GridModalComponentState, nextContext: any) {
@@ -47,43 +47,37 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         let i = 1;
         nextProps.layout.x.map((g, x) => nextProps.layout.y.map((g, y) => (obj[x][y] = i++)));
         this.object.currentObject = obj;
+        this.renderCanvas();
         return true;
     }
 
     render() {
         return (
-            <>
-                <div className="modal fade" id="gridModal" ref="modal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div className="modal-dialog modal-lg" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">
-                                    コンテンツ配置
-                                </h5>
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div className="modal-body" ref="canvasFrame" style={{ height: this.state.canvasFrameSize.x }}>
-                                <canvas
-                                    ref="canvas"
-                                    width={this.state.canvasFrameSize.x}
-                                    height={this.state.canvasFrameSize.x}
-                                    style={{ width: this.state.canvasFrameSize.x + 'px', height: this.state.canvasFrameSize.x + 'px' }}
-                                />
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-dismiss="modal">
-                                    Close
-                                </button>
-                                <button type="button" className="btn btn-primary" onClick={this.hideModal}>
-                                    Apply
-                                </button>
-                            </div>
-                        </div>
+            <div className={'setting-frame ' + (this.props.enable ? 'enable' : 'disable')}>
+                <div className={'setting-overlay'} onClick={this.props.close} />
+                <div className="setting-base" onClick={() => {}}>
+                    <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                    </button>
+                    <div className="setting-header">コンテンツ配置</div>
+                    <div className="setting-content" ref="canvasFrame">
+                        <canvas
+                            ref="canvas"
+                            width={this.state.canvasFrameSize.x}
+                            height={this.state.canvasFrameSize.x}
+                            style={{ width: this.state.canvasFrameSize.x + 'px', height: this.state.canvasFrameSize.x + 'px' }}
+                        />
+                    </div>
+                    <div className="setting-footer">
+                        <button type="button" className="btn btn-secondary ml-1" style={{ width: '80px' }} onClick={this.props.close}>
+                            {'Close'}
+                        </button>
+                        <button type="button" className="btn btn-primary ml-1" style={{ width: '80px' }} onClick={this.hideModal}>
+                            {'Apply'}
+                        </button>
                     </div>
                 </div>
-            </>
+            </div>
         );
     }
 
