@@ -54,7 +54,7 @@ const production = {
     entry: entry,
     output: {
         path: path.resolve(__dirname, "prod-dist"),
-        filename: "[name].bundle.js"
+        filename: "[name].bundle.js?[hash]"
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js", ".json"]

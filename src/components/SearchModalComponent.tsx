@@ -40,9 +40,9 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
             <div className={'setting-frame ' + (this.props.enable ? 'enable' : 'disable')}>
                 <div className={'setting-overlay'} onClick={this.props.close} />
                 <div className="setting-base" onClick={() => {}}>
-                    <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}>
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                    </button>
+                    {/* <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}> */}
+                    {/* <FontAwesomeIcon icon={faChevronLeft} /> */}
+                    {/* </button> */}
                     <div className="setting-header">コンテンツ検索</div>
                     <div className="setting-content">
                         <div className="input-group mb-3">

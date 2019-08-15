@@ -36,7 +36,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
 
     componentDidMount() {
         const { width: width, height: height } = dom(this.refs.canvasFrame);
-        this.setState({ canvasFrameSize: new Point(width - 60, height - 60) });
+        this.setState({ canvasFrameSize: new Point(width - 32, height - 32) });
         this.canvasContext = (this.refs.canvas as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D;
         this.renderCanvas();
         this.handlerCanvas();
@@ -56,11 +56,11 @@ export default class GridModalComponent extends React.Component<GridModalCompone
             <div className={'setting-frame ' + (this.props.enable ? 'enable' : 'disable')}>
                 <div className={'setting-overlay'} onClick={this.props.close} />
                 <div className="setting-base" onClick={() => {}}>
-                    <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}>
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                    </button>
+                    {/* <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}> */}
+                    {/* <FontAwesomeIcon icon={faChevronLeft} /> */}
+                    {/* </button> */}
                     <div className="setting-header">コンテンツ配置</div>
-                    <div className="setting-content" ref="canvasFrame">
+                    <div className="setting-content" ref="canvasFrame" style={{ overflowY: 'hidden' }}>
                         <canvas
                             ref="canvas"
                             width={this.state.canvasFrameSize.x}

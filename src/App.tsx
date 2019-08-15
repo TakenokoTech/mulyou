@@ -39,7 +39,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
             screenSize: new Point(0, 0),
             url: v ? v : item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
             moveXY: { ix: null, iy: null },
-            setting: true,
+            setting: false,
             layout: { x: l.x || [], y: l.y || [] },
             bulkPlay: false,
             bulkVolume: 0,
