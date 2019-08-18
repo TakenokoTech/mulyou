@@ -7,10 +7,12 @@ export enum SessionKey {
 
 class Session {
     save(key: SessionKey, value: string) {
+        // console.log('save', key, value);
         window.sessionStorage.setItem(key, value);
     }
 
     load(key: SessionKey): string | null {
+        // console.log('load', key);
         return window.sessionStorage.getItem(key);
     }
 

@@ -1,13 +1,22 @@
+import queryString from 'query-string';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import queryString from 'query-string';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 import { BrowserRouter, Route } from 'react-router-dom';
-import { AppContainer } from './App';
+import BindingAppContainer from './container/BindingAppContainer';
+import { StoreState } from './store/types';
+import { BindAction } from './store/action';
+import { bindReducer, bindInit } from './store/reducer';
+
+const store = createStore<StoreState, BindAction, any, any>(bindReducer, bindInit);
 
 const Root = () => (
-    <BrowserRouter>
-        <Route render={props => <AppContainer query={queryString.parse(props.location.search, { arrayFormat: 'comma' })} />} />
-    </BrowserRouter>
+    <Provider store={store}>
+        <BrowserRouter>
+            <Route render={props => <BindingAppContainer query={queryString.parse(props.location.search, { arrayFormat: 'comma' })} />} />
+        </BrowserRouter>
+    </Provider>
 );
 
 ReactDOM.render(<Root />, document.getElementById('root'));

@@ -54,7 +54,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
     }
 
     render() {
-        // console.log(this.props.height, this.props.width);
+        console.log('videoId', this.props.videoId);
         return (
             <div
                 className={`frame_box`}
