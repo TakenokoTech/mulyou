@@ -15,6 +15,7 @@ interface MadiaComponentProps {
     setting: boolean;
     bulkVolume: number;
     bulkPlay: boolean;
+    onReady: (title: string) => void;
     onEnd: () => void;
 }
 
@@ -115,6 +116,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
         console.log('onReady');
         //event.target.pauseVideo();
         event.target.mute();
+        this.props.onReady(event.target.getVideoData().title);
         this.setState({ player: event.target });
     };
 

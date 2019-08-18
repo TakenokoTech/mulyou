@@ -9,3 +9,5 @@ export function dom(ref: ReactInstance) {
     const width = node.getBoundingClientRect().width;
     return { height: height, width: width };
 }
+
+export type NowplayItem = { videoId: string; title?: string };

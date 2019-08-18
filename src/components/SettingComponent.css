@@ -129,9 +129,9 @@
     width: 100%;
     max-width: 600px;
     height: 100%;
-    background-color: #fff;
+    background-color: #f9f9f9;
     transition: .2s ease-in-out;
-    box-shadow: -5px 0rem 5rem rgba(0, 0, 0, .3)
+    box-shadow: -5px 0rem 5rem rgba(0, 0, 0, .3);
 }
 
 .setting-frame.disable .setting-base {
@@ -155,6 +155,7 @@
     border-bottom: 1px solid #dee2e6;
     text-align: center;
     font-size: 1.25rem;
+    background-color: #f9f9f9;
 }
 
 .setting-content {
@@ -164,6 +165,7 @@
     padding: 16px;
     width: 100%;
     overflow-y: scroll;
+    background-color: #f9f9f9;
 }
 
 .setting-footer {
@@ -175,6 +177,7 @@
     bottom: 0px;
     border-top: 1px solid #dee2e6;
     text-align: end;
+    background-color: #f9f9f9;
 }
 
 @keyframes opacity-in {

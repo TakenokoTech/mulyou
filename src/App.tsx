@@ -2,13 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import queryString, { ParsedQuery } from 'query-string';
 import './App.css';
-import { dom } from './dom.extension';
+import { dom, NowplayItem } from './dom.extension';
 import Point from './utils/Point';
 import MadiaComponent from './components/MediaComponent';
 import DragComponent from './components/DragComponent';
 import Session, { SessionKey } from './utils/Session';
 import SettingComponent from './components/SettingComponent';
-import { Location } from 'history';
+import _ from 'lodash';
 
 interface AppContainerProps {
     query: ParsedQuery<string>;
@@ -16,7 +16,7 @@ interface AppContainerProps {
 
 interface AppContainerState {
     screenSize: Point;
-    url: (string | null)[];
+    nowplay: NowplayItem[];
     moveXY: { ix: number | null; iy: number | null };
     setting: boolean;
     layout: { x: number[]; y: number[] };
@@ -32,12 +32,10 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         const gridLayout = Session.load(SessionKey.GridLayout);
         const l = gridLayout ? JSON.parse(gridLayout) : { x: [1, 1], y: [1, 1] };
 
-        const item = Session.load(SessionKey.NowPlayItem);
-        const v = this.props.query.v;
-
+        const init: NowplayItem[] = [{ videoId: 'uXYXC0jaN74' }, { videoId: 'Y8XpPA4jCts' }, { videoId: 'vi3AR3T70lE' }, { videoId: '8GbAsgrEpS0' }];
         this.state = {
             screenSize: new Point(0, 0),
-            url: v ? v : item ? JSON.parse(item) : ['uXYXC0jaN74', 'Y8XpPA4jCts', 'vi3AR3T70lE', '8GbAsgrEpS0'],
+            nowplay: this.getNowplay().length > 0 ? this.getNowplay() : init,
             moveXY: { ix: null, iy: null },
             setting: false,
             layout: { x: l.x || [], y: l.y || [] },
@@ -89,7 +87,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
 
     shouldComponentUpdate(nextProps: AppContainerProps, nextState: AppContainerState, nextContext: any) {
         // console.log(nextState.url);
-        Session.save(SessionKey.NowPlayItem, JSON.stringify(nextState.url));
+        Session.save(SessionKey.NowPlayItem, JSON.stringify(nextState.nowplay));
         return true;
     }
 
@@ -112,11 +110,12 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
                 {grid.map((g, x, xl) => {
                     return g.map((p, y, yl) => {
                         const index = x * yl.length + y;
+                        const videoId = (this.state.nowplay[index] || { videoId: '' }).videoId;
                         return (
                             <MadiaComponent
                                 screenSize={this.state.screenSize}
                                 key={`f${x}${y}`}
-                                videoId={this.state.url[index]}
+                                videoId={videoId}
                                 height={this.getHeight(x, y, grid, height) - 8}
                                 width={this.getWidth(x, y, grid, width) - 8}
                                 left={p.x}
@@ -124,6 +123,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
                                 setting={this.state.setting}
                                 bulkVolume={this.state.bulkVolume}
                                 bulkPlay={this.state.bulkPlay}
+                                onReady={title => this.setTitle(index, title)}
                                 onEnd={() => this.next(index)}
                             />
                         );
@@ -194,14 +194,33 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         // });
     };
 
-    private addInputItem = (value: string) => (value != '' ? this.setState({ url: this.state.url.concat([value]) }) : null);
+    getNowplay = (): NowplayItem[] => {
+        const query = ((): NowplayItem[] => {
+            if (this.props.query.v instanceof Array) {
+                return this.props.query.v.map(v => {
+                    return { videoId: v };
+                });
+            }
+            if (typeof this.props.query.v == 'string') {
+                return [{ videoId: this.props.query.v }];
+            }
+            return [];
+        })();
+        const item = Session.load(SessionKey.NowPlayItem);
+        let session = item ? (JSON.parse(item) as NowplayItem[]) : [];
+        session = session.filter(i => query.map(q => (q ? q.videoId : '----')).indexOf(i ? i.videoId : '---') == -1);
+
+        return _.union(query, session);
+    };
+
+    private addInputItem = (value: string) => (value != '' ? this.setState({ nowplay: this.state.nowplay.concat([{ videoId: value, title: '' }]) }) : null);
 
     private addSearchItem = (item: YoutubeItem[]) => {
-        this.state.url.forEach((v, i) => {
+        this.state.nowplay.forEach((v, i) => {
             if (v == null) {
                 const it = item.shift();
-                this.state.url[i] = it ? it.id.videoId : null;
-                this.setState({ url: this.state.url });
+                this.state.nowplay[i] = it ? { videoId: it.id.videoId } : null;
+                this.setState({ nowplay: this.state.nowplay });
             }
         });
 
@@ -211,32 +230,37 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         Session.save(SessionKey.HistoryItem, JSON.stringify(historyItem));
 
         const count = this.state.layout.x.length * this.state.layout.y.length;
-        const len = this.state.url.length;
+        const len = this.state.nowplay.length;
         for (let index = 0; index < count; index++) {
             if (len <= index) this.next(index);
         }
     };
 
+    private setTitle = (index: number, title: string) => {
+        this.state.nowplay[index].title = title;
+        this.setState({ nowplay: this.state.nowplay });
+    };
+
     private next = (index: number) => {
         console.log(`next ${index}`);
         const count = this.state.layout.x.length * this.state.layout.y.length;
-        const len = this.state.url.length;
+        const len = this.state.nowplay.length;
         if (count < len) {
-            this.state.url[index] = this.state.url[count];
-            this.state.url.splice(count, 1);
-            this.setState({ url: this.state.url });
+            this.state.nowplay[index] = this.state.nowplay[count];
+            this.state.nowplay.splice(count, 1);
+            this.setState({ nowplay: this.state.nowplay });
             return;
         }
 
         const h = Session.load(SessionKey.HistoryItem);
         let stock = h ? (JSON.parse(h) as YoutubeItem[]) : [];
         if (stock.length > 0) {
-            this.state.url[index] = stock[0].id.videoId;
+            this.state.nowplay[index] = { videoId: stock[0].id.videoId };
             Session.save(SessionKey.HistoryItem, JSON.stringify(stock.slice(1)));
         } else {
-            this.state.url[index] = null;
+            this.state.nowplay[index] = null;
         }
-        this.setState({ url: this.state.url });
+        this.setState({ nowplay: this.state.nowplay });
     };
 
     private setLayout = (lx: number[], ly: number[]) => {
@@ -244,7 +268,12 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         this.setState({ layout: { x: lx, y: ly } });
     };
 
-    private makeLink = (): string => `${location.origin}?${queryString.stringify({ v: this.state.url }, { arrayFormat: 'comma' })}`;
+    private makeLink = (): string => {
+        const url = `${location.origin}?${queryString.stringify({ v: this.state.nowplay.map(v => (v ? v.videoId : '')) }, { arrayFormat: 'comma' })}`;
+        console.log(url);
+        return url;
+    };
+
     private allVolumeDown = () => this.setState({ bulkVolume: Math.max(this.state.bulkVolume - 10, 0) });
     private allVolumeUp = () => this.setState({ bulkVolume: Math.min(this.state.bulkVolume + 10, 100) });
     private allStart = () => this.setState({ bulkPlay: true });

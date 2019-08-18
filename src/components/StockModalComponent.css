@@ -1,0 +1,43 @@
+.nowplay_li {
+    position: relative;
+    width: 120;
+    height: 74;
+    background-color: #DDD;
+    text-align: center;
+    padding: 8px;
+    color: #FFF;
+    border-radius: 4px;
+}
+
+.nowplay_no {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #BBB;
+    border-radius: 4px 0px 4px 0px;
+    padding: 0px 8px;
+    font-size: 0.8em;
+}
+
+.nowplay_icon {
+    display: block;
+    position: absolute;
+    height: 36px;
+    width: 36px;
+    top: 0px;
+    bottom: 24px;
+    right: 0px;
+    left: 0px;
+    margin: auto;
+}
+
+.stock_no {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: #17a2b8;
+    border-radius: 4px 0px 4px 0px;
+    padding: 0px 8px;
+    font-size: 0.8em;
+    color: #FFF;
+}
