@@ -59,6 +59,17 @@ export default class SettingComponent extends React.Component<SettingComponentPr
         this.frame = document.getElementById('settingPanel');
     }
 
+    shouldComponentUpdate(nextProps: SettingComponentProps, nextState: SettingComponentState, nextContext: any) {
+        if (this.state.clipurl != this.props.makeLink()) {
+            nextState.copied = false;
+            nextState.clipurl = this.props.makeLink();
+        }
+        if (!this.state.copied && nextState.copied) {
+            alert(`[コピーしました]\n${this.props.makeLink()}`);
+        }
+        return true;
+    }
+
     render() {
         return (
             <>
@@ -86,7 +97,7 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                             <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
                             <div className="input-group-append">
                                 <button
-                                    className="btn btn-outline-secondary"
+                                    className="btn btn-outline-secondary plusid"
                                     type="button"
                                     onClick={e => this.props.addInputItem((this.refs.inputVideo as HTMLInputElement).value)}
                                 >
@@ -95,51 +106,41 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                                 </button>
                             </div>
                             <div>
-                                <button type="button" className="btn btn-info ml-1" onClick={this.showSearch}>
+                                <button type="button" className="btn ml-2 setting-button" onClick={this.showSearch}>
                                     検索
                                 </button>
                             </div>
                         </div>
                         <div style={{ fontSize: '18px', textAlign: 'center', paddingTop: '8px' }}>
                             <div style={{ paddingTop: '8px', display: 'inline-flex' }}>
-                                <CopyToClipboard
-                                    text={this.state.clipurl}
-                                    onCopy={() => {
-                                        alert(`[コピーしました]\n${this.props.makeLink()}`);
-                                        this.setState({ copied: true });
-                                    }}
-                                >
-                                    <button
-                                        type="button"
-                                        className="btn btn-info btn-sm btn-icon ml-1 mr-2"
-                                        onClick={() => this.setState({ clipurl: this.props.makeLink() })}
-                                    >
+                                <CopyToClipboard text={this.state.clipurl} onCopy={() => this.setState({ copied: true })}>
+                                    <button type="button" className="btn btn-sm btn-icon ml-1 mr-2 setting-button">
                                         {/* シェア */}
                                         <FontAwesomeIcon icon={faShareAlt} />
                                     </button>
                                 </CopyToClipboard>
-                                <button type="button" className="btn btn-success btn btn-icon ml-1" onClick={this.props.allVolumeDown}>
+                                <button type="button" className="btn btn-icon ml-1 setting-button" onClick={this.props.allVolumeDown}>
                                     {/* ミュート */}
                                     <FontAwesomeIcon icon={faVolumeDown} />
                                 </button>
-                                <button type="button" className="btn btn-success btn btn-icon ml-1" onClick={this.props.allVolumeUp}>
+                                <button type="button" className="btn btn-icon ml-1 mr-2 setting-button" onClick={this.props.allVolumeUp}>
                                     {/* 音あり */}
                                     <FontAwesomeIcon icon={faVolumeUp} />
                                 </button>
-                                <button type="button" className="btn btn-primary btn btn-icon ml-1" onClick={this.props.allStart}>
+                                <button type="button" className="btn btn-icon ml-1 setting-button" onClick={this.props.allStart}>
                                     {/* 全再生 */}
                                     <FontAwesomeIcon icon={faPlay} />
                                 </button>
-                                <button type="button" className="btn btn-primary btn btn-icon ml-1" onClick={this.props.allStop}>
+                                <button type="button" className="btn btn-icon ml-1 setting-button" onClick={this.props.allStop}>
                                     {/* 全停止 */}
                                     <FontAwesomeIcon icon={faStop} />
                                 </button>
                             </div>
                             <div style={{ paddingTop: '8px', display: 'inline-flex' }}>
-                                <button type="button" className="btn btn-info btn ml-1 ml-3" onClick={this.showStock}>
+                                <button type="button" className="btn ml-1 ml-3 setting-button" onClick={this.showStock}>
                                     ストック
                                 </button>
-                                <button type="button" className="btn btn-info btn ml-1" onClick={this.showGrid}>
+                                <button type="button" className="btn ml-1 setting-button" onClick={this.showGrid}>
                                     グリッド
                                 </button>
                             </div>

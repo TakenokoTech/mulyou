@@ -114,7 +114,9 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
 
     private onReady = (event: { target: any }) => {
         console.log('onReady');
-        //event.target.pauseVideo();
+        if (!this.props.bulkPlay) {
+            event.target.pauseVideo();
+        }
         event.target.mute();
         this.props.onReady(event.target.getVideoData().title);
         this.setState({ player: event.target });

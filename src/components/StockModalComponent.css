@@ -1,7 +1,7 @@
 .nowplay_li {
     position: relative;
-    width: 120;
-    height: 74;
+    width: 120px;
+    height: 90px;
     background-color: #DDD;
     text-align: center;
     padding: 8px;
@@ -17,6 +17,13 @@
     border-radius: 4px 0px 4px 0px;
     padding: 0px 8px;
     font-size: 0.8em;
+}
+
+.nowplay_text {
+    position: absolute;
+    bottom: 16px;
+    left: 0;
+    right: 0;
 }
 
 .nowplay_icon {

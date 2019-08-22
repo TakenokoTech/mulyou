@@ -89,10 +89,10 @@ export default class SearchModalComponent extends React.Component<SearchModalCom
                         </ul>
                     </div>
                     <div className="setting-footer">
-                        <button type="button" className="btn btn-secondary ml-1" style={{ width: '80px' }} onClick={this.props.close}>
+                        <button type="button" className="btn ml-1 setting-button" style={{ width: '80px' }} onClick={this.props.close}>
                             {'Close'}
                         </button>
-                        <button type="button" className="btn btn-primary ml-1" style={{ width: '80px' }} onClick={this.add}>
+                        <button type="button" className="btn ml-1 setting-button positive" style={{ width: '80px' }} onClick={this.add}>
                             {'Add'}
                         </button>
                     </div>

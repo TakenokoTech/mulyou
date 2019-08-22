@@ -46,6 +46,6 @@ export const storeStateInit = {
     nowplay: initNowplay(),
     layout: initLayout(),
     setting: false,
-    bulkPlay: false,
+    bulkPlay: true,
     bulkVolume: 0,
 };

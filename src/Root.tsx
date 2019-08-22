@@ -5,11 +5,11 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 import BindingAppContainer from './container/BindingAppContainer';
-import { StoreState } from './store/types';
+import { StoreState, storeStateInit } from './store/types';
 import { BindAction } from './store/action';
-import { bindReducer, bindInit } from './store/reducer';
+import { bindReducer } from './store/reducer';
 
-const store = createStore<StoreState, BindAction, any, any>(bindReducer, bindInit);
+const store = createStore<StoreState, BindAction, any, any>(bindReducer, storeStateInit);
 
 const Root = () => (
     <Provider store={store}>
