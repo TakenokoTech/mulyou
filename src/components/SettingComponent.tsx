@@ -28,6 +28,7 @@ interface SettingComponentProps {
     screenSize: Point;
     enable: boolean;
     layout: { x: number[]; y: number[] };
+    resize: () => void;
     addInputItem: (value: string) => void;
     addSearchItem: (item: YoutubeItem[]) => void;
     setLayout: (lx: number[], ly: number[]) => void;
@@ -94,13 +95,9 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                     </div>
                     <div id="setting_content">
                         <div className="input-group">
-                            <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID" aria-label="Video ID" />
+                            <input type="text" className="form-control" ref="inputVideo" placeholder="Video ID or URL" aria-label="Video ID or URL" />
                             <div className="input-group-append">
-                                <button
-                                    className="btn btn-outline-secondary plusid"
-                                    type="button"
-                                    onClick={e => this.props.addInputItem((this.refs.inputVideo as HTMLInputElement).value)}
-                                >
+                                <button className="btn btn-outline-secondary plusid" type="button" onClick={this.inputVideo}>
                                     {/* ADD　 */}
                                     <FontAwesomeIcon icon={faPlus} />
                                 </button>
@@ -141,7 +138,7 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                                     ストック
                                 </button>
                                 <button type="button" className="btn ml-1 setting-button" onClick={this.showGrid}>
-                                    グリッド
+                                    設定
                                 </button>
                             </div>
                         </div>
@@ -165,6 +162,7 @@ export default class SettingComponent extends React.Component<SettingComponentPr
                         setLayout={this.props.setLayout}
                         enable={this.state.gridEnable}
                         close={() => this.setState({ gridEnable: false })}
+                        resize={this.props.resize}
                     />
                 </>
                 {/*
@@ -187,6 +185,12 @@ export default class SettingComponent extends React.Component<SettingComponentPr
             </>
         );
     }
+
+    inputVideo = () => {
+        const input = this.refs.inputVideo as HTMLInputElement;
+        this.props.addInputItem(input.value);
+        input.value = '';
+    };
 
     switchSetting = () => {
         this.props.enable ? this.props.closeSetting() : this.props.openSetting();

@@ -30,17 +30,15 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
 
         const { width: width, height: height } = dom(this.refs.frame);
         this.props.setScreenSize(new Point(width, height - 32));
-
-        window.addEventListener('resize', () => {
-            console.log('resize');
-            const { width: width, height: height } = dom(this.refs.frame);
-            this.props.setScreenSize(new Point(width, height - 32));
-        });
     }
 
     shouldComponentUpdate(nextProps: AppContainerProps, nextState: AppContainerState, nextContext: any) {
         console.log('shouldComponentUpdate', nextProps, nextState);
         Session.save(SessionKey.NowPlayItem, JSON.stringify(nextProps.nowplay));
+        for (const n in nextProps.nowplay) {
+            const size = nextProps.layout.x.length * nextProps.layout.y.length;
+            if (nextProps.nowplay[n] == null && nextProps.nowplay.length > size) this.props.nextContents(+n);
+        }
         return true;
     }
 
@@ -107,6 +105,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
                     screenSize={this.props.screenSize}
                     enable={this.props.setting}
                     layout={this.props.layout}
+                    resize={this.resize}
                     addInputItem={this.props.addItemFromText}
                     addSearchItem={this.props.addItemFromSearch}
                     setLayout={this.props.setLayout}
@@ -175,5 +174,11 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
         const url = `${location.origin}?${queryString.stringify({ v: this.props.nowplay.map(v => (v ? v.videoId : '')) }, { arrayFormat: 'comma' })}`;
         console.log(url);
         return url;
+    };
+
+    private resize = () => {
+        console.log('resize');
+        const { width: width, height: height } = dom(this.refs.frame);
+        this.props.setScreenSize(new Point(width, height - 32));
     };
 }

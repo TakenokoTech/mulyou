@@ -54,7 +54,7 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
     }
 
     render() {
-        console.log('videoId', this.props.videoId);
+        // console.log('videoId', this.props.videoId);
         return (
             <div
                 className={`frame_box`}
@@ -62,6 +62,9 @@ export default class MadiaComponent extends React.Component<MadiaComponentProps,
                     left: this.props.left,
                     top: this.props.top,
                     border: this.props.setting && this.state.selecting ? '4px solid #F00' : '4px solid #F000',
+                    width: `${this.props.width}`,
+                    height: `${this.props.height}`,
+                    textAlign: 'center',
                 }}
                 key={this.props.videoId || ''}
             >

@@ -3,16 +3,17 @@ export enum SessionKey {
     GridLayout = 'GridLayout',
     HistoryItem = 'HistoryItem',
     NowPlayItem = 'NowPlayItem',
+    EnableResize = 'EnableResize',
 }
 
 class Session {
     save(key: SessionKey, value: string) {
-        // console.log('save', key, value);
+        console.log('save', key, value);
         window.sessionStorage.setItem(key, value);
     }
 
     load(key: SessionKey): string | null {
-        // console.log('load', key);
+        console.log('load', key);
         return window.sessionStorage.getItem(key);
     }
 

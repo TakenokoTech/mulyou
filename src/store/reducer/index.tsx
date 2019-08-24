@@ -35,6 +35,13 @@ const addItemFromText = (prevState: StoreState, videoId: string): StoreState => 
     if (videoId == '') {
         return prevState;
     }
+
+    const pattern = ['http[s]://www.youtube.com/watch\\?v=(.*?)(&|$)', 'http[s]://youtu.be/(.*?)(&|$)', '(.*?)(&|$)'];
+    pattern.forEach(p => {
+        const result = new RegExp(p).exec(videoId);
+        if (result != null) videoId = result[1];
+    });
+
     return { ...prevState, nowplay: prevState.nowplay.concat([{ videoId: videoId, title: '' }]) };
 };
 
