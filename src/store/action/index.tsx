@@ -1,5 +1,17 @@
 import * as ACTION from '../constants';
 import Point from '../../utils/Point';
+import { ParsedQuery } from 'query-string';
+
+/**
+ *
+ */
+interface InitNowPlay {
+    type: ACTION.INIT_NOW_PLAY;
+    payload: ParsedQuery<string>;
+}
+export const initNowPlay = (query: ParsedQuery<string>): InitNowPlay => {
+    return { type: ACTION.INIT_NOW_PLAY, payload: query };
+};
 
 /**
  *
@@ -134,6 +146,7 @@ export const allVolumeUp = (): AllVolumeUp => {
 };
 
 export type BindAction =
+    | InitNowPlay
     | SetScreenSize
     | SetLayout
     | AddItemFromText

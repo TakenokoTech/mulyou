@@ -1,3 +1,6 @@
+export const INIT_NOW_PLAY = 'INIT_NOW_PLAY';
+export type INIT_NOW_PLAY = typeof INIT_NOW_PLAY;
+
 export const SET_SCREEN_SIZE = 'SET_SCREEN_SIZE';
 export type SET_SCREEN_SIZE = typeof SET_SCREEN_SIZE;
 

@@ -1,11 +1,38 @@
+import { Reducer, Action } from 'redux';
+import { ParsedQuery } from 'query-string';
+import _ from 'lodash';
 import { StoreState, storeStateInit } from '../types';
 import * as ACTION from '../constants';
 import { BindAction } from '../action';
-import { Reducer, Action } from 'redux';
 import Point from '../../utils/Point';
 import Session, { SessionKey } from '../../utils/Session';
 import { NowplayItem } from '../../dom.extension';
-import _ from 'lodash';
+
+/**
+ *
+ * @param prevState
+ * @param q
+ */
+const initNowPlay = (prevState: StoreState, q: ParsedQuery<string>) => {
+    const init: NowplayItem[] = [{ videoId: 'uXYXC0jaN74' }, { videoId: 'Y8XpPA4jCts' }, { videoId: 'vi3AR3T70lE' }, { videoId: '8GbAsgrEpS0' }];
+    const getNowplay = (): NowplayItem[] => {
+        const query = ((): NowplayItem[] => {
+            if (q.v instanceof Array) {
+                return q.v.map(v => {
+                    return { videoId: v };
+                });
+            }
+            if (typeof q.v == 'string') return [{ videoId: q.v }];
+            return [];
+        })();
+        const item = Session.load(SessionKey.NowPlayItem);
+        let session: NowplayItem[] = item ? (JSON.parse(item) as NowplayItem[]) : [];
+        session = session.filter(i => query.map(q => (q ? q.videoId : '----')).indexOf(i ? i.videoId : '---') == -1);
+        return _.union(query, session);
+    };
+    const nowplay = getNowplay().length > 0 ? getNowplay() : init;
+    return { ...prevState, nowplay: nowplay };
+};
 
 /**
  *
@@ -164,6 +191,7 @@ const allVolumeUp = (prevState: StoreState): StoreState => {
  * Action Mapping
  */
 const actionMapping: { [key: string]: (prevState: StoreState, action: any) => StoreState } = {
+    [ACTION.INIT_NOW_PLAY]: initNowPlay,
     [ACTION.SET_SCREEN_SIZE]: setScreenSize,
     [ACTION.SET_LAYOUT]: setLayout,
     [ACTION.ADD_ITEM_FROM_TEXT]: addItemFromText,

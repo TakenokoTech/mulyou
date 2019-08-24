@@ -67,6 +67,7 @@ export default class SettingComponent extends React.Component<SettingComponentPr
         }
         if (!this.state.copied && nextState.copied) {
             alert(`[コピーしました]\n${this.props.makeLink()}`);
+            nextState.copied = false;
         }
         return true;
     }

@@ -1,5 +1,6 @@
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import queryString, { ParsedQuery } from 'query-string';
 import { StoreState } from '../store/types';
 
 import * as actions from '../store/action';
@@ -7,6 +8,7 @@ import { AppContainer } from './AppContainer';
 import Point from '../utils/Point';
 
 export interface MapDispatchProps {
+    initNowPlay: (query: ParsedQuery<string>) => void;
     setScreenSize: (point: Point) => void;
     setLayout: (x: number[], y: number[]) => void;
     addItemFromText: (videoId: string) => void;
@@ -27,6 +29,7 @@ const mapStateToProps = (state: StoreState) => {
 
 const mapDispatchToProps = (dispatch: Dispatch<actions.BindAction>): MapDispatchProps => {
     return {
+        initNowPlay: (query: ParsedQuery<string>) => dispatch(actions.initNowPlay(query)),
         setScreenSize: (point: Point) => dispatch(actions.setScreenSize(point)),
         setLayout: (x: number[], y: number[]) => dispatch(actions.setLayout(x, y)),
         addItemFromText: (videoId: string) => dispatch(actions.addItemFromText(videoId)),

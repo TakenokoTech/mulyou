@@ -30,6 +30,7 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
 
         const { width: width, height: height } = dom(this.refs.frame);
         this.props.setScreenSize(new Point(width, height - 32));
+        this.props.initNowPlay(this.props.query);
     }
 
     shouldComponentUpdate(nextProps: AppContainerProps, nextState: AppContainerState, nextContext: any) {
@@ -171,7 +172,8 @@ export class AppContainer extends React.Component<AppContainerProps, AppContaine
     };
 
     private makeLink = (): string => {
-        const url = `${location.origin}?${queryString.stringify({ v: this.props.nowplay.map(v => (v ? v.videoId : '')) }, { arrayFormat: 'comma' })}`;
+        const endpoint = 'https://takenokotech.github.io/mulyou/';
+        const url = `${endpoint}?${queryString.stringify({ v: this.props.nowplay.map(v => (v ? v.videoId : '')) }, { arrayFormat: 'comma' })}`;
         console.log(url);
         return url;
     };
