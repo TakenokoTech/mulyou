@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { isValidElement } from 'react';
 import Point from '../utils/Point';
 import './GridModalComponent.css';
 import { dom } from '../dom.extension';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { Toggle } from 'react-toggle-component';
+import Session, { SessionKey } from '../utils/Session';
 
 interface GridModalComponentProps {
     screenSize: Point;
@@ -11,10 +11,12 @@ interface GridModalComponentProps {
     setLayout: (lx: number[], ly: number[]) => void;
     enable: boolean;
     close: () => void;
+    resize: () => void;
 }
 
 interface GridModalComponentState {
     canvasFrameSize: Point;
+    disableResize: boolean;
 }
 
 export default class GridModalComponent extends React.Component<GridModalComponentProps, GridModalComponentState> {
@@ -31,7 +33,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
 
     constructor(props: GridModalComponentProps) {
         super(props);
-        this.state = { canvasFrameSize: new Point(0, 0) };
+        this.state = { canvasFrameSize: new Point(0, 0), disableResize: false };
     }
 
     componentDidMount() {
@@ -48,6 +50,14 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         nextProps.layout.x.map((g, x) => nextProps.layout.y.map((g, y) => (obj[x][y] = i++)));
         this.object.currentObject = obj;
         this.renderCanvas();
+
+        if (this.props.enable != nextProps.enable) {
+            const enableResize = Session.load(SessionKey.EnableResize) != 'false';
+            if (enableResize) window.addEventListener('resize', this.props.resize);
+            else window.removeEventListener('resize', this.props.resize);
+            nextState.disableResize = !enableResize;
+        }
+
         return true;
     }
 
@@ -59,20 +69,35 @@ export default class GridModalComponent extends React.Component<GridModalCompone
                     {/* <button type="button" className="btn btn-icon setting-header-btn" onClick={this.props.close}> */}
                     {/* <FontAwesomeIcon icon={faChevronLeft} /> */}
                     {/* </button> */}
-                    <div className="setting-header">コンテンツ配置</div>
+                    <div className="setting-header">設定</div>
                     <div className="setting-content" ref="canvasFrame" style={{ overflowY: 'hidden' }}>
-                        <canvas
-                            ref="canvas"
-                            width={this.state.canvasFrameSize.x}
-                            height={this.state.canvasFrameSize.x}
-                            style={{ width: this.state.canvasFrameSize.x + 'px', height: this.state.canvasFrameSize.x + 'px' }}
-                        />
+                        <div className="pb-5">
+                            <Toggle
+                                name="toggle-1"
+                                checked={this.state.disableResize}
+                                controlled={true}
+                                rightBackgroundColor="#00A497"
+                                knobColor={this.state.disableResize ? '#FFF' : '#00A497'}
+                                borderColor="#00A497"
+                                onToggle={e => this.setState({ disableResize: !this.state.disableResize })}
+                            />
+                            {' リサイズ時に動画をリロードしない'}
+                        </div>
+                        <div className="pb-5">
+                            コンテンツ配置
+                            <canvas
+                                ref="canvas"
+                                width={this.state.canvasFrameSize.x}
+                                height={this.state.canvasFrameSize.x}
+                                style={{ width: this.state.canvasFrameSize.x + 'px', height: this.state.canvasFrameSize.x + 'px' }}
+                            />
+                        </div>
                     </div>
                     <div className="setting-footer">
-                        <button type="button" className="btn btn-secondary ml-1" style={{ width: '80px' }} onClick={this.props.close}>
+                        <button type="button" className="btn ml-1 setting-button" style={{ width: '80px' }} onClick={this.props.close}>
                             {'Close'}
                         </button>
-                        <button type="button" className="btn btn-primary ml-1" style={{ width: '80px' }} onClick={this.hideModal}>
+                        <button type="button" className="btn ml-1 setting-button positive" style={{ width: '80px' }} onClick={this.hideModal}>
                             {'Apply'}
                         </button>
                     </div>
@@ -254,5 +279,7 @@ export default class GridModalComponent extends React.Component<GridModalCompone
         const y = this.getLayout().y + 1;
         console.log(x, y);
         this.props.setLayout(Array(x).fill(1), Array(y).fill(1));
+        Session.save(SessionKey.EnableResize, !this.state.disableResize ? 'true' : 'false');
+        this.props.close();
     };
 }

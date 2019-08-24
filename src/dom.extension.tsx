@@ -10,4 +10,4 @@ export function dom(ref: ReactInstance) {
     return { height: height, width: width };
 }
 
-export type NowplayItem = { videoId: string; title?: string };
+export type NowplayItem = { videoId?: string; title?: string };

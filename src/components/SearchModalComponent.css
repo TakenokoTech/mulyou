@@ -1,0 +1,47 @@
+.setting-frame #serch-channel {
+    position: relative;
+    padding: 0 32px;
+}
+
+.setting-frame .serchChannelFrame {
+    width: 100%;
+    display: inline-block;
+    overflow-x: hidden;
+    /* padding: 0px 32px; */
+    white-space: nowrap;
+}
+
+.setting-frame .serchChannel {
+    width: 96px;
+    display: inline-block;
+    padding: 8px;
+}
+
+.setting-frame .serchChannel img {
+    width: 100%;
+    border-radius: 100%;
+}
+
+.setting-frame .serchChannel img:hover {
+    opacity: 0.5;
+}
+
+.setting-frame .serchChannelLeft {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 32px;
+    height: 100%;
+    min-width: auto;
+    background-color: #0001;
+}
+
+.setting-frame .serchChannelRight {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 32px;
+    height: 100%;
+    min-width: auto;
+    background-color: #0001;
+}

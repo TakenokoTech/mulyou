@@ -69,12 +69,11 @@ export default class StockModalComponent extends React.Component<StockModalCompo
                                         >
                                             <div className="nowplay_li">
                                                 <div className="nowplay_no">{i + 1}</div>
-                                                <br />
                                                 <FontAwesomeIcon icon={faVideo} className="nowplay_icon" />
-                                                {i < this.state.nowplayCount ? '再生中' : '割込'}
+                                                <div className="nowplay_text">{i < this.state.nowplayCount ? '再生中' : '割込'}</div>
                                             </div>
                                         </div>
-                                        <div className="media-body" style={{ textAlign: 'left' }}>
+                                        <div className="media-body" style={{ textAlign: 'left', paddingTop: '4px' }}>
                                             <b>{item ? item.title : ''}</b>
                                         </div>
                                     </li>
@@ -110,10 +109,10 @@ export default class StockModalComponent extends React.Component<StockModalCompo
                         </ul>
                     </div>
                     <div className="setting-footer">
-                        <button type="button" className="btn btn-secondary ml-1" style={{ width: '80px' }} onClick={this.props.close}>
+                        <button type="button" className="btn ml-1 setting-button" style={{ width: '80px' }} onClick={this.props.close}>
                             {'Close'}
                         </button>
-                        <button type="button" className="btn btn-danger ml-1" style={{ width: '80px' }} onClick={e => this.deleteStock()}>
+                        <button type="button" className="btn ml-1 setting-button negative" style={{ width: '80px' }} onClick={e => this.deleteStock()}>
                             {'Delete'}
                         </button>
                     </div>

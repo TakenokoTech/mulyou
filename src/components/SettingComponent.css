@@ -8,6 +8,8 @@
     /* border-radius: 8px; */
     color: #444;
     transition: .2s ease-in-out;
+    border-radius: 32px 32px 0px 0px;
+    /* background-color: #222; */
 }
 
 #settingPanel.enable {
@@ -37,7 +39,7 @@
 
 #setting_content {
     position: relative;
-    padding: 16px 16px;
+    padding: 16px 16px 32px;
     max-width: 600px;
     max-height: 600;
     left: 50%;
@@ -48,6 +50,17 @@
     /* max-height: 0px; */
     padding: 0px;
     opacity: 0;
+}
+
+#setting_content input {
+    border-radius: 16px 0 0 16px;
+    background-color: #FFFa;
+    border-color: #6c757d;
+}
+
+#setting_content .plusid {
+    border-radius: 0 16px 16px 0;
+    padding: 0 24px;
 }
 
 #settingPanelClose {
@@ -82,6 +95,7 @@
 #setting_content .btn-icon {
     height: 36px;
     width: 48px;
+    min-width: 0px;
 }
 
 /* ============================================================= */
@@ -179,6 +193,43 @@
     text-align: end;
     background-color: #f9f9f9;
 }
+
+.setting-button {
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    border-radius: 16px;
+    min-width: 90px;
+    background-color: #CCC9;
+    color: #555;
+}
+
+.setting-button:hover {
+    background-color: #555;
+    color: #FFF;
+}
+
+.setting-button.positive {
+    background-color: #00A497;
+    color: #FFF;
+}
+
+.setting-button.positive:hover {
+    border: 1px solid #00A497;
+    background-color: transparent;
+    color: #00A497;
+}
+
+.setting-button.negative {
+    background-color: #DE0D81;
+    color: #FFF;
+}
+
+.setting-button.negative:hover {
+    border: 1px solid #DE0D81;
+    background-color: transparent;
+    color: #DE0D81;
+}
+
 
 @keyframes opacity-in {
     0% {

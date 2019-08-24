@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: repeat(6, 220px);
-    grid-auto-flow: dense;
+    /* grid-auto-flow: dense; */
 }
 
 .app-container {
