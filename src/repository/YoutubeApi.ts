@@ -1,5 +1,4 @@
 import setting from '../../setting.json';
-import { gapi } from '../utils/gapi';
 
 /**
  * 動画検索
