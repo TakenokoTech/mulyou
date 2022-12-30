@@ -47,7 +47,7 @@
         "i": "^0.3.6",
         "lodash": "^4.17.15",
         "mathjs": "^6.0.3",
-        "mocha": "^6.2.0",
+        "mocha": "^10.2.0",
         "muuri": "^0.8.0",
         "postcss-loader": "^3.0.0",
         "query-string": "^6.8.2",
